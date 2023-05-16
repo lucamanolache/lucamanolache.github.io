@@ -2,7 +2,7 @@
 layout: post
 title:  Hello world!
 date:   2023-05-03 18:54:45 -0700
-categories: jekyll update
+categories: misc
 ---
 Hello world! This is just a test...
 
