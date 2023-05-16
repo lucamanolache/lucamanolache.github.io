@@ -322,13 +322,13 @@ This section is still a work in progress.
 I have a rudementary method set up that could use plenty of improvements.
 
 ```python
-        while True:
-            data = sd.rec(int(seconds * fs), samplerate=fs, channels=channels, blocking=True)
-            data = data[:88000]
-            x = preprocess(data)
-            y_hat = model(x.unsqueeze(1))
-            conf = y_hat.detach().numpy()[0][0]
-            print("Not a snap" if conf < 0.65 else "Snap", conf)
+while True:
+    data = sd.rec(int(seconds * fs), samplerate=fs, channels=channels, blocking=True)
+    data = data[:88000]
+    x = preprocess(data)
+    y_hat = model(x.unsqueeze(1))
+    conf = y_hat.detach().numpy()[0][0]
+    print("Not a snap" if conf < 0.65 else "Snap", conf)
 ```
 
 This will record an audio clip of 2 seconds and run the model we trained on it.
