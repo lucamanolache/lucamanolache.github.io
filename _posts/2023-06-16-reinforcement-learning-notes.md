@@ -2,7 +2,7 @@
 layout: post
 title:  Reinforcement Learning Notes Sutton
 date:   2023-06-16 15:09:00 -0000
-categories: ai
+categories: ml
 ---
 
 <script>
