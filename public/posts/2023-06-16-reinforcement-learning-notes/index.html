@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html><head lang="en"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Reinforcement Learning Notes Sutton - Luca Manolache</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="
+
+
+
+Notes for the book &ldquo;Reinforcement Learning&rdquo; by Sutton and Barto
+Table of Contents
+
+The Reinforcement Learning Problem
+
+Terms
+Elements of Reinforcement Learning
+Limitations and Scope
+
+
+Multi-arm Bandits
+
+The n-Armed Bandit Problem
+Action-Value Methods
+Incremental Implementation
+Tracking a Non-stationary Problem
+Optimistic Initial Values
+Upper-Confidence-Bound Action Selection
+Gradient Bandits
+
+
+Finite Markov Decision Processes
+
+Agent-Environment Interface
+Goals and Rewards
+Returns
+The Markov Property
+Markov Decision Processes
+Value Functions
+
+
+Dynamic Programming
+
+Policy Evaluation
+Policy Improvement
+Policy Iteration
+Asynchronous Dynamic Programming
+
+
+Monte Carlo Methods
+
+Monte Carlo Prediction
+Monte Carlo Estimation of Action Values
+Off-policy Prediction via Importance Sampling
+Incremental Implementation
+
+
+Temporal Difference Learning
+
+TD Prediction
+Sarsa: On-Policy TD Control
+Q-Learning: Off-Policy TD Control
+
+
+Eligibility Traces
+
+n-Step TD Prediction
+TD(λ)
+
+
+Planning and Learning with Tabular Methods
+
+Models and Planning
+Integrated Planning, Acting, and Learning
+When the Model is Wrong
+Trajectory Sampling
+Heuristic Search
+
+
+On-policy Approximation of Action Values
+
+Value Prediction with Function Approximation
+
+
+Policy Approximation
+
+Actor-Critic Methods
+Eligibility Traces for Actor-Critic Methods
+
+
+
+" />
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content="http://localhost:1313/posts/2023-06-16-reinforcement-learning-notes/">
+  <meta property="og:site_name" content="Luca Manolache">
+  <meta property="og:title" content="Reinforcement Learning Notes Sutton">
+  <meta property="og:description" content="Notes for the book “Reinforcement Learning” by Sutton and Barto
+Table of Contents The Reinforcement Learning Problem Terms Elements of Reinforcement Learning Limitations and Scope Multi-arm Bandits The n-Armed Bandit Problem Action-Value Methods Incremental Implementation Tracking a Non-stationary Problem Optimistic Initial Values Upper-Confidence-Bound Action Selection Gradient Bandits Finite Markov Decision Processes Agent-Environment Interface Goals and Rewards Returns The Markov Property Markov Decision Processes Value Functions Dynamic Programming Policy Evaluation Policy Improvement Policy Iteration Asynchronous Dynamic Programming Monte Carlo Methods Monte Carlo Prediction Monte Carlo Estimation of Action Values Off-policy Prediction via Importance Sampling Incremental Implementation Temporal Difference Learning TD Prediction Sarsa: On-Policy TD Control Q-Learning: Off-Policy TD Control Eligibility Traces n-Step TD Prediction TD(λ) Planning and Learning with Tabular Methods Models and Planning Integrated Planning, Acting, and Learning When the Model is Wrong Trajectory Sampling Heuristic Search On-policy Approximation of Action Values Value Prediction with Function Approximation Policy Approximation Actor-Critic Methods Eligibility Traces for Actor-Critic Methods">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-06-16T15:09:00+00:00">
+    <meta property="article:modified_time" content="2023-06-16T15:09:00+00:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Reinforcement Learning Notes Sutton">
+  <meta name="twitter:description" content="Notes for the book “Reinforcement Learning” by Sutton and Barto
+Table of Contents The Reinforcement Learning Problem Terms Elements of Reinforcement Learning Limitations and Scope Multi-arm Bandits The n-Armed Bandit Problem Action-Value Methods Incremental Implementation Tracking a Non-stationary Problem Optimistic Initial Values Upper-Confidence-Bound Action Selection Gradient Bandits Finite Markov Decision Processes Agent-Environment Interface Goals and Rewards Returns The Markov Property Markov Decision Processes Value Functions Dynamic Programming Policy Evaluation Policy Improvement Policy Iteration Asynchronous Dynamic Programming Monte Carlo Methods Monte Carlo Prediction Monte Carlo Estimation of Action Values Off-policy Prediction via Importance Sampling Incremental Implementation Temporal Difference Learning TD Prediction Sarsa: On-Policy TD Control Q-Learning: Off-Policy TD Control Eligibility Traces n-Step TD Prediction TD(λ) Planning and Learning with Tabular Methods Models and Planning Integrated Planning, Acting, and Learning When the Model is Wrong Trajectory Sampling Heuristic Search On-policy Approximation of Action Values Value Prediction with Function Approximation Policy Approximation Actor-Critic Methods Eligibility Traces for Actor-Critic Methods">
+
+        <link href="http://localhost:1313/css/fonts.2c2227b81b1970a03e760aa2e6121cd01f87c88586803cbb282aa224720a765f.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" media="screen" href="http://localhost:1313/css/main.ebab3cdab514812ae87420376868866f1f961f23c3eba7d8d1f16eb62308a54b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="http://localhost:1313/css/dark.0953caef1b838ade4b219e3b6b9b54f92357b9ff5c3f3ddec1c1f583b807cbbc.css" media="(prefers-color-scheme: dark)"  />
+		
+		<link rel="stylesheet" type="text/css" href="http://localhost:1313/css/custom.c98772c6a0e44a03c25b6b1d0a53b4ee8e5f95502683a7993fd45decfcbdc6d0.css">
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="http://localhost:1313/">Luca Manolache</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">Posts</a>
+		
+		<a href="/papers">Papers</a>
+		
+		<a href="/teaching">Teaching</a>
+		
+		<a href="/resume">Resume</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		
+	</nav>
+</header>
+
+<main>
+  <article>
+    <div class="post-container">
+      
+      <div class="post-content">
+        <div class="title">
+          <h1 class="title">Reinforcement Learning Notes Sutton</h1>
+          <div class="meta">Posted on Jun 16, 2023</div>
+        </div>
+        
+        <section class="body">
+          <!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>Notes for the book <a href="https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf">&ldquo;Reinforcement Learning&rdquo; by Sutton and Barto</a></p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#org0aa0346">The Reinforcement Learning Problem</a>
+<ol>
+<li><a href="#org1c3f54e">Terms</a></li>
+<li><a href="#org72c4eb4">Elements of Reinforcement Learning</a></li>
+<li><a href="#org5b1867e">Limitations and Scope</a></li>
+</ol>
+</li>
+<li><a href="#orgc4593d0">Multi-arm Bandits</a>
+<ol>
+<li><a href="#org4d4d191">The n-Armed Bandit Problem</a></li>
+<li><a href="#orgbf3cbce">Action-Value Methods</a></li>
+<li><a href="#orgccb0a8b">Incremental Implementation</a></li>
+<li><a href="#org170d560">Tracking a Non-stationary Problem</a></li>
+<li><a href="#org20c1418">Optimistic Initial Values</a></li>
+<li><a href="#orgf610985">Upper-Confidence-Bound Action Selection</a></li>
+<li><a href="#org5bfac35">Gradient Bandits</a></li>
+</ol>
+</li>
+<li><a href="#org6a6f048">Finite Markov Decision Processes</a>
+<ol>
+<li><a href="#org02432cc">Agent-Environment Interface</a></li>
+<li><a href="#orgd30daf6">Goals and Rewards</a></li>
+<li><a href="#orgb70fa84">Returns</a></li>
+<li><a href="#org3aa6f79">The Markov Property</a></li>
+<li><a href="#org48c49f2">Markov Decision Processes</a></li>
+<li><a href="#org886d6af">Value Functions</a></li>
+</ol>
+</li>
+<li><a href="#org9c82917">Dynamic Programming</a>
+<ol>
+<li><a href="#org17a598b">Policy Evaluation</a></li>
+<li><a href="#orged48075">Policy Improvement</a></li>
+<li><a href="#org5c218d2">Policy Iteration</a></li>
+<li><a href="#orgbcce2f3">Asynchronous Dynamic Programming</a></li>
+</ol>
+</li>
+<li><a href="#org6a8f574">Monte Carlo Methods</a>
+<ol>
+<li><a href="#orgee69425">Monte Carlo Prediction</a></li>
+<li><a href="#orgcab3bb9">Monte Carlo Estimation of Action Values</a></li>
+<li><a href="#org3c2102b">Off-policy Prediction via Importance Sampling</a></li>
+<li><a href="#org8b8d9c2">Incremental Implementation</a></li>
+</ol>
+</li>
+<li><a href="#org93fc6cb">Temporal Difference Learning</a>
+<ol>
+<li><a href="#org164e6dc">TD Prediction</a></li>
+<li><a href="#org9bf1fe8">Sarsa: On-Policy TD Control</a></li>
+<li><a href="#org5d2fcd3">Q-Learning: Off-Policy TD Control</a></li>
+</ol>
+</li>
+<li><a href="#orge24d76b">Eligibility Traces</a>
+<ol>
+<li><a href="#org21b1b70"><em>n</em>-Step TD Prediction</a></li>
+<li><a href="#org6dc06c3">TD(λ)</a></li>
+</ol>
+</li>
+<li><a href="#orgf8e0391">Planning and Learning with Tabular Methods</a>
+<ol>
+<li><a href="#org2f453f9">Models and Planning</a></li>
+<li><a href="#org57600f2">Integrated Planning, Acting, and Learning</a></li>
+<li><a href="#org7b8b423">When the Model is Wrong</a></li>
+<li><a href="#org760ae04">Trajectory Sampling</a></li>
+<li><a href="#orgc7deb08">Heuristic Search</a></li>
+</ol>
+</li>
+<li><a href="#org0d36e8a">On-policy Approximation of Action Values</a>
+<ol>
+<li><a href="#org61c880f">Value Prediction with Function Approximation</a></li>
+</ol>
+</li>
+<li><a href="#org5f7a2ad">Policy Approximation</a>
+<ol>
+<li><a href="#orgb4dea9b">Actor-Critic Methods</a></li>
+<li><a href="#org83f18eb">Eligibility Traces for Actor-Critic Methods</a></li>
+</ol>
+</li>
+</ol>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="the-reinforcement-learning-problem">The Reinforcement Learning Problem</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="terms">Terms</h3>
+<table>
+  <thead>
+      <tr>
+          <th>Term</th>
+          <th>Definition</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>$s$</td>
+          <td>state</td>
+      </tr>
+      <tr>
+          <td>$a$</td>
+          <td>action</td>
+      </tr>
+      <tr>
+          <td>$\Delta$</td>
+          <td>set of all nonterminal states</td>
+      </tr>
+      <tr>
+          <td>$\Delta^+$</td>
+          <td>set of all states</td>
+      </tr>
+      <tr>
+          <td>$A(s)$</td>
+          <td>set of all possible actions in state $s$</td>
+      </tr>
+      <tr>
+          <td>$R$</td>
+          <td>set of possible rewards</td>
+      </tr>
+      <tr>
+          <td>$t$</td>
+          <td>discrete time step</td>
+      </tr>
+      <tr>
+          <td>$T$</td>
+          <td>final time step</td>
+      </tr>
+      <tr>
+          <td>$S_t$</td>
+          <td>state at $t$</td>
+      </tr>
+      <tr>
+          <td>$A_t$</td>
+          <td>action at $t$</td>
+      </tr>
+      <tr>
+          <td>$R_t$</td>
+          <td>reward at $t$, dependent on $A_{t-1}$ and $S_{t-1}$</td>
+      </tr>
+      <tr>
+          <td>$G_t$</td>
+          <td>cumulative discounted reward following $t$</td>
+      </tr>
+      <tr>
+          <td>$G_t^{(n)}$</td>
+          <td><em>n</em>-step return</td>
+      </tr>
+      <tr>
+          <td>$G_t^\lambda$</td>
+          <td>λ-return</td>
+      </tr>
+      <tr>
+          <td>$\pi$</td>
+          <td>policy</td>
+      </tr>
+      <tr>
+          <td>$\pi(s)$</td>
+          <td>action taken in state $s$</td>
+      </tr>
+      <tr>
+          <td>$\pi(a \mid s)$</td>
+          <td>probability of taking action $a$ in state $s$</td>
+      </tr>
+      <tr>
+          <td>$p(s&rsquo;, r \mid s)$</td>
+          <td>probability of transitioning to $s&rsquo;$ with reward $r$</td>
+      </tr>
+      <tr>
+          <td>$v_\pi(s)$</td>
+          <td>value of $s$ under policy $\pi$ (expected return)</td>
+      </tr>
+      <tr>
+          <td>$v_*(s)$</td>
+          <td>value of state $s$ under optimal policy</td>
+      </tr>
+      <tr>
+          <td>$q_\pi(s, a)$</td>
+          <td>value of taking action $a$ under policy $\pi$</td>
+      </tr>
+      <tr>
+          <td>$q_*(s, a)$</td>
+          <td>value of taking action $a$ under optimal policy $\pi$</td>
+      </tr>
+      <tr>
+          <td>$V_t(s)$</td>
+          <td>estimate of $v_\pi(s)$ or $v_*(s)$</td>
+      </tr>
+      <tr>
+          <td>$Q_t(s, a)$</td>
+          <td>estimate of $q_\pi(s, a)$ or $q_*(s, a)$</td>
+      </tr>
+      <tr>
+          <td>$\gamma$</td>
+          <td>discount-rate parameter</td>
+      </tr>
+      <tr>
+          <td>$\epsilon$</td>
+          <td>probability of random action in ε-greedy</td>
+      </tr>
+      <tr>
+          <td>$\alpha$, $\beta$</td>
+          <td>step-size parameters</td>
+      </tr>
+      <tr>
+          <td>$\lambda$</td>
+          <td>decay-rate parameter</td>
+      </tr>
+  </tbody>
+</table>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="elements-of-reinforcement-learning">Elements of Reinforcement Learning</h3>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="policy">Policy</h4>
+<p>A <em>policy</em> defines the way the agent behaves. It is a mapping from perceived
+states to actions to be taken. A policy can be anything from a DNN to a look up
+table.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="reward-signal">Reward signal</h4>
+<p>A <em>reward signal</em> defines the goal of a reinforcement learning problem. It
+should be given after every action taken in the environment. The goal of
+reinforcement learning is to find a policy $$\pi$$ that maximizes the <em>reward
+signal</em>. Reward is an immediate indication of what is good.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="value-function">Value function</h4>
+<p>A <em>value function</em> specifies what is good in the long run. The <em>value</em> of a
+state is the total amount of reward an agent can get in the future from that
+state.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="model">Model</h4>
+<p>A model is something that mimics the behavior of the environment or allows
+inference to be made about how the environment will behave. Models are used for
+planning. Methods that use models and planning are called <em>model-based</em> methods
+compared to <em>model-free</em> methods.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="limitations-and-scope">Limitations and Scope</h3>
+<p>Other methods such as genetic algorithms can be used when there is a lot of time
+and the space of policies is small. Additionally, they can be used when the
+learning agent cannot accurately sense the state of the environment.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="multi-arm-bandits">Multi-arm Bandits</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="the-n-armed-bandit-problem">The n-Armed Bandit Problem</h3>
+<p>You have $$n$$ different actions. After each action you receive a reward chosen
+from a stationary probability distribution that depends on the action you chose.
+Your objective is to maximize the expected total reward over a time period of
+$$x$$ <em>time steps</em>. You do not know the probability distributions of any of the
+actions.</p>
+<p>This is similar to a slot machine with $$n$$ levers. The rewards are the payoffs
+for hitting the jackpot. Since you do not know the probability distributions of
+any of the arms, you need to balance being <em>greedy</em> (<em>exploiting</em> your
+knowledge) and selecting non-greedy actions (<em>exploring</em>).</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="action-value-methods">Action-Value Methods</h3>
+<p>The actual value of an action $$a$$ is $$q(a)$$ and the predicted value is $$Q_t(a)$$.
+The true value of an action is the mean reward received when that action is
+selected.</p>
+<p>\begin{equation}
+Q_t(a)=\frac{R_1+R_2+&hellip;+R_{N_{t(a)}}}{N_t(a)}
+\end{equation}</p>
+<p>At the start we define $$Q_t(a)=0$$ or some other default value until we have some
+data. As we go through each action more and more, we can begin to get a more
+accurate estimate of the $$Q$$ function. As $$N_t(a)\to\infty$$ we will get the true
+$$q(a)$$ (law of large numbers).</p>
+<p>The <em>greedy</em> action selection policy for this approach is simple:</p>
+<p>\begin{equation}
+A_t=\mathop{\text{argmax }}_{a}Q_t(a)
+\end{equation}</p>
+<p>This approach has the flaw that it is only exploiting current knowledge and is
+not spending any time to explore. This will get stuck on local maximums, not
+finding out if other policies would give higher rewards.</p>
+<p>The better approach is to have a small chance $$\epsilon$$ to do a random action.
+This guarantees that $$N_t(a)\to\infty$$ for all $$a$$ ensuring $$Q_t(a)$$ will converge
+to $$q(a)$$.</p>
+<p>This becomes even more necessary when the rewards are non-stationary - the reward
+distributions can change over time.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="incremental-implementation">Incremental Implementation</h3>
+<p>We can write equation 1 more efficiently.</p>
+<p>\begin{equation}
+Q_{k+1}=Q_k + \frac{1}{k}[R_k-Q_k]
+\end{equation}</p>
+<p>In code this would be</p>
+<pre><code>q = q + a [ r - q ]
+</code></pre>
+<p>where <code>q</code> is $$Q_k$$, <code>a</code> is the step size $$\frac{1}{k}$$, and <code>r</code> is the rewards
+$$R_k$$.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="tracking-a-non-stationary-problem">Tracking a Non-stationary Problem</h3>
+<p>When our problem is non-stationary, we don’t want to decrease the amount we are
+incrementing by as in equation 3 ($$\frac{1}{k}$$ will decrease to 0). So we
+change it to $$\alpha\in(0,1]$$, the step-size parameter</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="optimistic-initial-values">Optimistic Initial Values</h3>
+<p>The methods above have the initial action-value estimates as $$0$$. This causes
+the training to be highly dependent on the first chosen action as that one will
+be exploited until the rest are visited by epsilon exploration. While we are
+guaranteed to converge as $$t\to\infty$$, we can do better by assigning all of the
+initial action-value estimates as something high. This will cause the learner to
+be “disappointed” in the ones it sees, guaranteeing it will explore each action
+early on.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="upper-confidence-bound-action-selection">Upper-Confidence-Bound Action Selection</h3>
+<p>ε-greedy action selection will force all of the non-greedy actions to be tried, but it does not have any preference for choosing which one. A better approach would be to try the actions which would choose actions based on uncertainty.</p>
+<p>\begin{equation}
+A_t=\mathop{\text{argmax }}\left[Q_t(a)+c\sqrt{\frac{\ln t}{N_t(a)}}\right]
+\end{equation}</p>
+<p>In this equation we will choose actions that maximize the Q value, however, as
+time goes on, the $$c\sqrt{\frac{\ln t}{N_t(a)}}$$ will grow and overwrite the Q
+value. This will cause those actions to be explored. Every time an action is
+chosen, the denominator increases, decreasing the uncertainty of that action.
+However, every time another action is chosen, the numerator increases
+logarithmically causing the exploring term to increase.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="gradient-bandits">Gradient Bandits</h3>
+<p>The previous examples of Q-learning all attempt to estimate reward from a given
+action. However, for policy gradients, we learn a numerical <em>preference</em>
+$$H_t(a)$$ for each action $$a$$. The larger the preference, the more action $$a$$
+gets chosen. This preferences does not have any connection to reward. If we add
+$$x$$ to every preference, nothing will change.</p>
+<p>In this we use the notation $$\pi_t(a)$$ for the probability of taking action $$a$$
+at time $$t$$. At the start, all actions have the same probability of being
+chosen. The policy is determined according to a soft-max distribution:</p>
+<p>\begin{equation}
+\pi_t(a)=\frac{e^{H_t(a)}}{\sum_{b=1}^n e^{H_t(b)}}
+\end{equation}</p>
+<p>We can update the preferences with stochastic gradient ascent. After selecting
+action $$A_t$$ and receiving the reward $$R_t$$ we update the preferences with
+equations 6 and 7.</p>
+<p>\begin{equation}
+H_{t+1}(A_t)=H_t(A_t)+\alpha(R_t-\bar{R_t})(1-\pi_t(A_t))
+\end{equation}</p>
+<p>and</p>
+<p>\begin{equation}
+H_{t+1}(a)=H_t(a)-\alpha(R_t-\bar{R_t})(\pi_t(A_t)), \forall a \ne A_t
+\end{equation}</p>
+<p>where $$\alpha&gt;0$$ is the step-size parameter and $$\bar{R_t}\in \mathbb{R}$$ is the
+average of all the rewards up to and including time $$t$$. Essentially, what this
+does is if the reward gained is higher than the baseline, then the probability
+of taking $$A_t$$ is increased and if it is lower, the probability is decreased.
+All the other actions move in an opposite direction.</p>
+<p>This is a stochastic approximation to gradient ascent. The exact <em>gradient ascent</em> would be increasing everything proportional to its effect on performance with:</p>
+<p>\begin{equation}
+H_{t+1}(a)=H_t(a)+\alpha\frac{\delta \mathbb{E}[R_t]}{\delta H_t(a)}
+\end{equation}</p>
+<p>where the measure of performance is the expected reward:</p>
+<p>\begin{equation*}
+\mathbb{E}[R_t]=\sum_{b} \pi_t(b)q(b)
+\end{equation*}</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="finite-markov-decision-processes">Finite Markov Decision Processes</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="agent-environment-interface">Agent-Environment Interface</h3>
+<p>The reinforcement learning problem is a framing of learning from interaction to
+achieve a goal. The learner and decision-maker is called the <em>agent</em>. The thing
+it interacts with is called the <em>environment</em>.</p>
+<p>The agent and the environment interact in a sequence of discrete time steps
+$$t = 1, 2, 3, \ldots$$. At each time step $$t$$ the agent receives a representation of
+the environment’s <em>state</em> $$S_t$$. One time step later it receives a numerical
+reward $$R_{t+1}$$ and a new state $$S_{t+1}$$.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="goals-and-rewards">Goals and Rewards</h3>
+<p>Sutton recommends that rewards only be given for what we actually want achieved.
+For example, for robot escaping a maze, the reward at each time step will
+decrease by $$-1$$ as we want it to escape as quickly as possible. For a chess
+robot, it will get $$1$$ for winning, $$-1$$ for losing, and $$0$$ for drawing and any
+non-terminal position. Sutton states that giving a reward for subgoals like
+capturing pieces might cause it to learn to capture pieces at the cost of
+losing.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="returns">Returns</h3>
+<p>A formal definition of the agents goal is to maximize the cumulative reward it
+receives in the long run. If the sequence of rewards received after step $$t$$ is
+denoted as $$R_{t+1}, R_{t+2}, R_{t+3},&hellip;R_T$$, then the expected return (in
+simplest form) $$G_t$$ is defined with the following equation:</p>
+<p>\begin{equation}
+G_t=R_{t+1} + R_{t+2} + R_{t+3} + &hellip; + R_T
+\end{equation}</p>
+<p>If the environment continues forever, this would infinite causing a problem. Therefore, we will <em>discount</em> the later rewards:</p>
+<p>\begin{equation}
+G_t=R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + &hellip; = \sum_{ k=0}^{\infty} \gamma^k R_{t+k+1}
+\end{equation}</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="the-markov-property">The Markov Property</h3>
+<p>An environment has the Markov property if the environment’s response at $$t+1$$
+depends only on the state and action $$S_t$$ and $$A_t$$. If it depends on previous
+actions and states, then it does not have the Markov property.</p>
+<p>However, even when the state signal is non-Markov, we can still think of the
+state in reinforcement learning as an approximation to a Markov state.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="markov-decision-processes">Markov Decision Processes</h3>
+<p>If a reinforcement learning task satisfies the Markov property, it is called a
+<em>Markov decision process</em> or <em>MDP</em>. If the state and action spaces are finite,
+then it is called a <em>finite MDP</em>. Given any state and action $$s$$ and $$a$$, the probability of each possible pair of next state and reward $$s&rsquo;$$ and $$r$$ is:</p>
+<p>\begin{equation}
+p(s&rsquo;, r \mid s, a) = Pr{S_{t+1}=s&rsquo;, R_{t+1}=r\mid S_t=s, A_t=a}
+\end{equation}</p>
+<p>Given these dynamics, we can compute anything else about the environment such as
+the expected rewards for state-action pairs:</p>
+<p>\begin{equation}
+r(s, a) = \mathbb{E}\left[R_{t+1}\mid S_t=s, A_t=a\right]=\sum_{r\in R} r \sum_{s&rsquo;\in S} p(s&rsquo;, r \mid s, a)
+\end{equation}</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="value-functions">Value Functions</h3>
+<p>The policy $$\pi$$ is a map from each state $$s$$ and action $$a$$ to the probability
+$$\pi(a\mid s)$$ of taking $$a$$ when in $$s$$. The <em>value</em> of state $$s$$ under policy
+$$\pi$$, $$v_\pi(s)$$ is the expected return when starting in $$s$$ and following
+$$\pi$$ after. For an MDP we can define this formally with:</p>
+<p>\begin{equation}
+v_\pi(s)=\mathbb{E}_\pi[G_t \mid S_t=s]=\mathbb{E}_\pi \left[ \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}\big| S_t=s\right]
+\end{equation}</p>
+<p>where $$\mathbb{E}_\pi [ \cdot ]$$ denotes the expected value of a random variable given that
+the agent follows policy $$\pi$$.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="dynamic-programming">Dynamic Programming</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="policy-evaluation">Policy Evaluation</h3>
+<p>As the value of any state $$s\in\mathcal{S}$$ under policy $$\pi$$ can be described
+by equation 13,</p>
+<p>\begin{equation}
+\begin{split}
+v_\pi(s)&amp;=\mathbb{E}_\pi\left[\sum_{k=0}^{\infty} \gamma^k R_{t+k+1}\big| S_t=s\right] \\\
+&amp;=\mathbb{E}_\pi[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t=s] \\\
+&amp;=\sum_a \pi(a\mid s) \sum_{s&rsquo;, r} p(s&rsquo;, r \mid s, a)[r+\gamma v_\pi(s&rsquo;)]
+\end{split}
+\end{equation}</p>
+<p>where $$\pi(a\mid s)$$ is the probability of taking action $$a$$ in state $$s$$ under
+$$\pi$$. In my understanding, what we are doing is finding the probability of
+getting each next state (the $$\pi(a\mid s))$$ part, and then multiplying the
+value of the state that action would give us by that probability. So if an
+action has a $$0%$$ chance of occurring, whatever value the state that action
+would bring doesn’t matter as we would never get there. And if we have a 50-50
+chance of picking 2 actions, our value would be the average of those 2 next
+state’s values.</p>
+<p>We can get the value function $$v_\pi(s)$$ through an iterative computation. If we
+have a sequence of value functions $$v_0, v_1, v_2, \ldots$$ mapping
+$$\mathcal{S}\mapsto\mathbb{R}$$, we can use the following iterative equation to
+converge to $$v_\pi$$:</p>
+<p>\begin{equation}
+v_{k+1}(s) =\mathbb{E}_\pi[R_{t+1}+\gamma v_k(S_{t+1})\mid S_t=s]
+\end{equation}</p>
+<p>To produce each next approximation $$v_{k+1}$$, it replaces the old value of $$s$$
+with the new value and the expected immediate rewards and all one-step
+transitions possible. This is called a <em>full backup</em> as it <em>backs up</em> the value
+of every state once to produce a new value function.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="policy-improvement">Policy Improvement</h3>
+<p>If we have the value function for a current policy, we can use it to determine if we should change our policy. We can do this by choosing an action $$a\ne\pi(s)$$ and using it for the next step and then following the current policy for the rest. If this gives a greater expected value, then our new policy would be better. The value of this method would be:</p>
+<p>\begin{equation}
+\begin{split}
+q_\pi(s,a)&amp;=\mathbb{E}_\pi[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t=s, A_t=a] \\\
+&amp;=\sum_{s&rsquo;,r} p(s&rsquo;, r \mid s, a)\left[r + \gamma v_\pi(s&rsquo;) \right]
+\end{split}
+\end{equation}</p>
+<p>To my understanding, what we are doing is finding the probability of every
+possible next reward and state given our action and multiplying it by its value
+under our current policy.</p>
+<p>Given that this is only for changing one policy for a single state, we can change the policy at <em>all</em> states and <em>all</em> possible actions:</p>
+<p>\begin{equation}
+\begin{split}
+\pi&rsquo;(s)&amp;=\mathop{\text{argmax }}_{a} q_\pi(s, a) \\\
+&amp;=\mathop{\text{argmax }}_{a} \mathbb{E}[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t=s, A_t=a] \\\
+&amp;=\mathop{\text{argmax }}_{a} \sum_{s&rsquo;, r} p(s&rsquo;, r|s, a)\left[r + \gamma v_\pi(s&rsquo;) \right]
+\end{split}
+\end{equation}</p>
+<p>This is finding all values of $$a$$ at which the value under our policy of that
+action are at their maximum. This new policy is going to be as good as or better
+than our current policy. If it is just as good, that means our current policy is
+the optimal policy.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="policy-iteration">Policy Iteration</h3>
+<p>We can use the previous two sections to find the value function for our current
+policy, then use that value function to improve our current policy, then find
+the value function for that new policy and repeat until we converge on the
+optimal policy.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="asynchronous-dynamic-programming">Asynchronous Dynamic Programming</h3>
+<p>Our current algorithm makes progress in successive sweeps of the entire state
+space. This locks it up in these sweeps before making any improvements.</p>
+<p>Asynchronous algorithms allow the agent to update the policy at the same time as
+it is using it. This allows it to back up parts of the state set that are most
+relative to the agent.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="monte-carlo-methods">Monte Carlo Methods</h2>
+<p>Previous sections require complete knowledge of the environment, using Monte
+Carlo methods, we can avoid this problem and only require <em>experience</em>.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="monte-carlo-prediction">Monte Carlo Prediction</h3>
+<p>If we want to find $$v_\pi(s)$$ given a set of episodes obtained by following
+$$\pi$$ and passing through $$s$$. Each occurrence of state $$s$$ is called a <em>visit</em>
+to $$s$$. $$s$$ might be visited many times, however the first time will be called
+the <em>first visit</em> to $$s$$.</p>
+<p><em>first-visit MC method</em> estimates $$v_\pi(s)$$ as the average of the returns
+following first visits to $$s$$. The <em>ever-visit MC method</em> averages returns
+following all visits to $$s$$.</p>
+<p>The first-visit MC method goes as follows:</p>
+<pre><code>env = Enviornment()
+p = Policy()
+V = dict()
+returns = dict()
+
+while True:
+    episode = []
+    state = env.reset()
+    done = False
+    while not done:
+        state, rewards, done = env.act(p(state))
+        episode.push((state, rewards))
+
+    occurences = {}
+    for state, rewards in episode:
+        G ← return following the first occurrence of s
+        Append G to Returns(s)
+        V (s) ← average(Returns(s))
+</code></pre>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="monte-carlo-estimation-of-action-values">Monte Carlo Estimation of Action Values</h3>
+<p>If a model is not available, we can estimate <em>action</em> values instead of <em>state</em>
+values. We can estimate $$q_*$$ using Monte Carlo methods. Our goal is to estimate
+$$q_\pi(s,a)$$ - the expected return when starting in state $$s$$, taking action
+$$a$$, and then following policy $$\pi$$. We can use the first-visit MC method for
+this as well</p>
+<p>One major flaw of this method, is if we have a deterministic policy, in each
+state only 1 action will ever be taken. This will cause us to never converge on
+$$q_\pi$$. In order for this to work, we must also balance out exploration.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="off-policy-prediction-via-importance-sampling">Off-policy Prediction via Importance Sampling</h3>
+<p>All previous methods use episodes generated with the current policy $$\pi$$.
+However, what if we only have data collected by another policy $$\mu$$ such that
+$$\mu\ne\pi$$ - can we estimate $$v_\pi$$ and $$q_\pi$$? In this, we call $$\pi$$ the
+<em>target policy</em> because we are learning its value function and we call $$\mu$$ the
+<em>behavior policy</em> because it is the policy controlling the agent and generating
+behavior.</p>
+<p>To do this, we require that every action taken under $$\pi$$ is also taken under
+$$\mu$$, in other words $$\pi(a\mid s) &gt; 0 \implies \mu(a\mid s) &gt; 0$$. This is because we can not
+learn the value of actions that never occur under $$\mu$$.</p>
+<p>Importance sampling is a general technique for estimating expected values under
+one distribution given samples from another. Given a starting state $$S_t$$, the
+probability of the subsequent state-action sequence, $$A_t, S_{t+1},
+A_{t+1},\ldots,S_T$$ occurring under any policy $$\pi$$ is:</p>
+<p>\begin{equation*}
+\prod_{k=t}^{T-1} \pi(A_k\mid S_k)p(S_{k+1}\mid S_k, A_k)
+\end{equation*}</p>
+<p>Since each event occurring is independent (by definition of our assumption of a
+MDP), we can use the product rule of statistics and multiply the chance of each
+event happening together. The chance of each action $$A_k$$ happening is given by
+the policy $$\pi$$ with $$\pi(A_k\mid S_k)$$. The probability of $$S_k$$ happening is
+given by the Markov chain with $$p(S_{k+1}\mid S_k, A_k)$$.</p>
+<p>We define the importance-sampling ratio as:</p>
+<p>\begin{equation}
+\rho_t^T=\frac{\prod_{k=t}^{T-1} \pi(A_k\mid S_k)p(S_{k+1}\mid S_k, A_k)}{\prod_{k=t}^{T-1} \mu(A_k\mid S_k)p(S_{k+1}\mid S_k, A_k)} = \prod_{k=t}^{T-1} \frac{\pi(A_k\mid S_k)}{\mu({A_k \mid S_k})}
+\end{equation}</p>
+<p>This makes intuitive sense as well. If our target policy $$\pi$$ has a high
+probability of doing an action and so does our behavior policy, then that action
+has a high importance.</p>
+<p>We can use this to then calculate the value function $$V(s)$$ with:</p>
+<p>\begin{equation}
+V(s)=\frac{\sum_{t\in \mathcal{J}(s)} \rho_t^{T(t)}G_t}{|\mathcal{J}(s)|}
+\end{equation}</p>
+<p>where $$\mathcal{J}(s)$$ is the set of all the times $$s$$ has been visited, $$G_t$$
+is the return after $$t$$ through $$T(t)$$.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="incremental-implementation-1">Incremental Implementation</h3>
+<p>We can make our algorithm incremental updating the value every time new data is
+found. Given returns $$G_1, G_2, \ldots, G_{n-1}$$ all starting with the same
+state and each with a random weight $$W_i$$ (where $$W_i=\rho_t^{T(t)}$$), we want
+to estimate:</p>
+<p>\begin{equation}
+V_n=\frac{\sum_{k=1}{n-1} W_k G_k}{\sum_{k=1}^{n-1} W_k}
+\end{equation}</p>
+<p>To update $$V_n$$ as we get more returns $$G_n$$, we use the following equation:</p>
+<p>\begin{equation}
+V_{n+1}=V_n+\frac{W_n}{C_n}[G_n-V_n]
+\end{equation}</p>
+<p>and</p>
+<p>\begin{equation*}
+C_{n+1}=C_n+W_{n+1}
+\end{equation*}</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="temporal-difference-learning">Temporal Difference Learning</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="td-prediction">TD Prediction</h3>
+<p>Both TD and Monte Carlo use experience to to solve their prediction problem and
+update their estimate of $$v$$ and of $$v_\pi$$. Monte Carlo must wait until the end
+of the episode to know $$G_t$$, however, TD methods can update the value function
+immediately. The simplest TD method known as <em>TD(0)</em> uses:</p>
+<p>\begin{equation}
+V(S_t)\leftarrow V(S_t) + \alpha \left[R_{t+1} + \gamma V(S_{t+1}) - V(S_t) \right]
+\end{equation}</p>
+<p>My understanding of this is that we can use our previous knowledge to estimate
+the return as $$G_t = \gamma V(S_{t+1}) - V(S_t)$$ because we know what the value
+of our next state is and we just see how much that would have increased by
+subtracting the value of the current state.</p>
+<p>We know from section 3 that $$v_\pi(s) = \mathbb{E}<em>\pi [G_t \mid S_t = s] =
+\mathbb{E}</em>\pi[R_{t+1}+\gamma v_\pi(S_{t+1)} \mid S_t=s]$$ (Equation 13).</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="sarsa-on-policy-td-control">Sarsa: On-Policy TD Control</h3>
+<p>Sarsa uses the idea of TD learning to estimate $$q_\pi(s, a)$$. It uses the
+following equation:</p>
+<p>\begin{equation}
+Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t) \right]
+\end{equation}</p>
+<p>Sarsa gets its name from the elements it uses to update Q function, $$S_t, A_t,
+R_{t+1}, S_{t+1}, A_{t+1}$$.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="q-learning-off-policy-td-control">Q-Learning: Off-Policy TD Control</h3>
+<p>In its simplest form, <em>one-step Q-learning</em> is defined by:</p>
+<p>\begin{equation}
+Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[R_{t+1} + \gamma \mathop{\text{ max }}_{a} Q(S_{t+1}, a) - Q(S_t,A_t) \right]
+\end{equation}</p>
+<p>The difference between this and Sarsa, is that we no longer need to know
+$$A_{t+1}$$ and instead choose whatever would be the best next action. It directly
+approximates $$q_*$$ independent of the policy being followed.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="eligibility-traces">Eligibility Traces</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="n-step-td-prediction"><em>n</em>-Step TD Prediction</h3>
+<p><em>n-Step TD Prediction</em> is an intermediate between Monte Carlo learning and TD
+learning. Instead of backing up every step like in TD learning or at the end of
+an episode like in Monte Carlo learning, we back up after <em>n</em> steps.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="tdλ">TD(λ)</h3>
+<p>One doesn’t have to do a backup just after <em>n</em>-step return, but toward the
+<em>average</em> of <em>n</em>-step returns. For example, one could do the backup of the
+average of a 2-step return and 4-step return with: $$\frac{1}{2}
+G_t^{t+2}(V_t(S_{t+2}))+\frac{1}{2}G_t^{t+4}(V_t(S_{t+4}))$$.</p>
+<p>Using this idea, we can define TD(λ) as a way of averaging <em>n</em>-step
+returns called <em>λ-return</em> defined by:</p>
+<p>\begin{equation}
+L_t=(1-\lambda)\sum_{n=1}^{\infty} \lambda^{n-1} G_t^{t+n}(V_t(S_{t+n}))
+\end{equation}</p>
+<p>One way of implementing this is by keeping a memory associated with every state
+called its <em>eligibility trace</em>. On each step, we update this with the following
+equation:</p>
+<p>\begin{equation}
+E_t(s)=\gamma\lambda E_{t-1}(s), \forall s \in \mathcal{S},s\ne S_t
+\end{equation}</p>
+<p>and</p>
+<p>\begin{equation}
+E_t(S_t)=\gamma\lambda E_{t-1}(S_t)
+\end{equation}</p>
+<p>where $$\gamma$$ is the discount rate and $$\lambda$$ is the parameter introduced in
+Equation 25. Now using this we can change the value with the following
+equations:</p>
+<p>\begin{equation}
+\delta_t = R_{t+1} + \gamma V_t(S_{t+1})-V_t(S_t)
+\end{equation}</p>
+<p>\begin{equation}
+\Delta V_t(s)=\alpha\delta_t E_t(s), \forall s \in \mathcal{S}
+\end{equation}</p>
+<p>These increments can be done on each step to form an online algorithm or at the
+end to form an offline algorithm.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="planning-and-learning-with-tabular-methods">Planning and Learning with Tabular Methods</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="models-and-planning">Models and Planning</h3>
+<p>A <em>model</em> of the environment is anything that can tell us how the environment
+will respond to actions. Given a state and an action, a model produces a
+prediction of the resultant next state and next reward. There are two types of
+models: a <em>distribution model</em> which produces all possible next states and their
+probabilities and a <em>sample model</em> which produces only one of the possibilities.</p>
+<p>There are two approaches for <em>planning</em>, or producing/improving a policy given a
+model: <em>state-space planning</em> where planning is a search through the state space
+for an optimal policy or path to a goal or <em>plan-space planning</em> which is a
+search through the space of plans.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="integrated-planning-acting-and-learning">Integrated Planning, Acting, and Learning</h3>
+<p>With a planning agent, there are 2 ways you can use real experiences, to
+directly improve the model (<em>model-learning</em>) or to directly improve the value
+function (<em>direct reinforcement learning</em>).</p>
+<pre><code>Initialize Q(s, a) and M odel(s, a) for all s ∈ S and a ∈ A(s)
+Do forever:
+    (a) S ← current (nonterminal) state
+    (b) A ← ε-greedy(S, Q)
+    (c) Execute action A; observe resultant reward, R, and state, S′
+    (d) Q(S, A) ← Q(S, A) + α[R + γ max_a Q(S′, a) − Q(S, A)]
+    (e) Model(S,A) ← R,S′ (assuming deterministic environment)
+    (f) Repeat n times:
+        S ← random previously observed state
+        A ← random action previously taken in S
+        R,S′ ← Model(S,A)
+        Q(S,A) ← Q(S,A) + α[R + γ max_a Q(S', a) - Q(S, A)]
+</code></pre>
+<p>In this code, step (d) is direct RL while steps (e) and (f) are model learning.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="when-the-model-is-wrong">When the Model is Wrong</h3>
+<p>When the environment is stochastic and only a limited number of samples have
+been observed, the model can be inaccurate and the planning process will compute
+a suboptimal policy. However, the suboptimal policy computer by the policy
+quickly leads to the discovery and correction of the model. This tends to happen
+when the model is optimistic.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="trajectory-sampling">Trajectory Sampling</h3>
+<p>Instead of sampling state-action pairs in the model uniformly like two sections
+ago, we can instead follow a trajectory using our current policy. This is simple
+to implement. We start from our starting state and then use our current policy
+to make a sample episode with our model.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="heuristic-search">Heuristic Search</h3>
+<p>Interesting.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="on-policy-approximation-of-action-values">On-policy Approximation of Action Values</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="value-prediction-with-function-approximation">Value Prediction with Function Approximation</h3>
+<p>Instead of the value function being a table, it can be a parameterized function
+with input vector $$\textbf{w} \in \mathbb{R}^n$$ We can write $$\hat{v}(s,\textbf{w})
+\approx v_\pi(s)$$ with the approximated value of state $$s$$ given by weight
+vector $$\textbf{w}$$.</p>
+<p>All of the backups used before can now be interpreted as making the function
+more like the value being backed up. Before this was moving a value in a table
+by a small amount, but now we can do this by changing the weights.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="policy-approximation">Policy Approximation</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="actor-critic-methods">Actor-Critic Methods</h3>
+<p>Actor-critic methods are TD methods that have a separate memory structure to
+explicitly represent the policy independent of the value function. The policy
+structure is known as the <em>actor</em> because it selects actions and the estimated
+value function is known as the <em>critic</em> because it criticizes the actions made
+by the actor. Learning is always on-policy: the critic must learn about and
+critique whatever policy is currently being followed by the actor. The critique
+takes the form of a TD error (a scalar signal) and is the only output of the
+critic:</p>
+<p>\begin{equation*}
+\delta_t = R_{t+1} + \gamma V_t(S_{t+1}) - V(S_t)
+\end{equation*}</p>
+<p>where $$V_t$$ is the value function implemented by the critic at time $$t$$. The TD
+error can be used to evaluate the action taken. If the TD error is positive, the
+tendency to select $$A_t$$ should be strengthened, conversely, if the TD error is
+negative, the tendency should be weakened. We can denote this with the following
+equation:</p>
+<p>\begin{equation*}
+H_{t+1}(S_t, A_t) = H_t(S_t, A_t)+\beta \delta_t
+\end{equation*}</p>
+<p>where $$H_t(s, a)$$ is the preference for taking action $$a$$ at time $$t$$ in state
+$$s$$.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="eligibility-traces-for-actor-critic-methods">Eligibility Traces for Actor-Critic Methods</h3>
+<p>We can add an eligibility trace to this with the following equation:</p>
+<p>\begin{equation*}
+H_{t+1}(s, a) = H_t(s, a)+\alpha\delta_t E_t(s,a)
+\end{equation*}</p>
+
+        </section>
+        <div class="post-tags">
+          
+          
+          
+        </div>
+      </div>
+
+      
+      
+    </div>
+
+    </article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/lucamanolache" rel="me" title="GitHub"><svg class="feather">
+   <use href="/svg/feather-sprite.51cf5647cb1987f769b616558f2620fd9423d72058490231b391bf6aa3744b55.svg#github" />
+</svg></a><a class="border"></a></div>
+  <div class="footer-info">
+    2025  © Luca Manolache 
+  </div>
+</footer>
+
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    }
+  };
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+ </div>
+    </body>
+</html> 

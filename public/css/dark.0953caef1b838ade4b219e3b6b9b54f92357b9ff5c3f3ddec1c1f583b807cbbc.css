@@ -1,0 +1,194 @@
+body {
+  color: white;
+  background-color: #282c34;
+}
+
+::-moz-selection {
+  background: #61afef;
+  color: #fff;
+  text-shadow: none;
+}
+
+::selection {
+  background: #61afef;
+  color: #fff;
+  text-shadow: none;
+}
+
+hr {
+  border-top: 3px dotted #61afef;
+}
+
+code {
+  background-color: #3e4451;
+  color: #56b6c2;
+  text-decoration: bold;
+  padding: 0.1em 0.2em;
+}
+
+pre {
+  background-color: #3e4451;
+  line-height: 1.4;
+  overflow-x: auto;
+  padding: 1em;
+}
+
+blockquote {
+  border-color: #61afef;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #98c379;
+}
+
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+  color: #98c379;
+}
+
+.toc {
+  background-color: #3e4451;
+  color: white;
+}
+
+a {
+  border-bottom: 3px solid #61afef;
+  color: #61afef;
+}
+
+a:hover {
+  background-color: #61afef;
+  color: #282c34;
+}
+
+.site-description a {
+  color: #98c379;
+}
+
+.site-description a:hover {
+  color: #282c34;
+}
+
+.tags a {
+  border-bottom: 3px solid #61afef;
+}
+
+.tags a:hover {
+  background-color: #61afef;
+  color: #282c34;
+}
+
+.site-title a {
+  color: #98c379;
+  text-decoration: none !important;
+}
+
+.header nav,
+.footer {
+  border-color: #3e4451;
+}
+
+.highlight {
+  background-color: #3e4451;
+}
+
+.soc:hover {
+  color: #282c34;
+}
+
+.draft-label {
+  color: #e06c75;
+  background-color: #3e4451;
+}
+
+.highlight pre code[class=language-javaScript]::before,
+.highlight pre code[class="language-js"]::before {
+  content: "js";
+  background: #f7df1e;
+  color: black;
+}
+.highlight pre code[class*='language-yml']::before,
+.highlight pre code[class*='language-yaml']::before {
+  content: 'yaml';
+  background: #f71e6a;
+  color: white;
+}
+.highlight pre code[class*='language-shell']::before,
+.highlight pre code[class*='language-bash']::before,
+.highlight pre code[class*='language-sh']::before {
+  content: 'shell';
+  background: green;
+  color:white
+}
+.highlight pre code[class*='language-json']::before{
+  content: 'json';
+  background: dodgerblue;
+   color: #000000 
+}
+.highlight pre code[class*='language-python']::before,
+.highlight pre code[class*='language-py']::before {
+  content: 'py';
+  background: blue;
+  color: yellow ;
+}
+.highlight pre code[class*='language-css']::before{
+  content: 'css';
+  background: cyan;
+  color: black ;
+}
+.highlight pre code[class*='language-go']::before{
+  content: 'Go';
+  background: cyan;
+  color: royalblue ;
+}
+.highlight pre code[class*='language-md']::before,
+.highlight pre code[class*='language-md']::before{
+  content: 'Markdown';
+  background: royalblue;
+  color: whitesmoke ;
+}
+
+.callout-alert {
+  color: #ffffff;
+  background-color: transparent;
+  border-width: 3px;
+  border-style: solid;
+  border-color: #ff6347;
+}
+
+.callout-custom {
+  color: #ffffff;
+}
+
+.callout-tip {
+  color: #ffffff;
+  background-color: transparent;
+  border-width: 3px;
+  border-style: solid;
+  border-color: dodgerblue;
+}
+
+.callout-warning {
+  color: #ffffff;
+  background-color: transparent;
+  border-width: 3px;
+  border-style: solid;
+  border-color: #ffd700;
+}
+
+strong {
+  color: #e06c75;
+}
+
+em {
+  color: #e5c07b;
+}

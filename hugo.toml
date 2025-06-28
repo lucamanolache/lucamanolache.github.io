@@ -1,0 +1,61 @@
+baseURL = "https://example.com"
+languageCode = "en-us"
+title = "Luca Manolache"
+theme="archie"
+copyright = "© Luca Manolache"
+pygmentsstyle = "monokai"
+pygmentscodefences = true
+pygmentscodefencesguesssyntax = true
+
+# Ignore certain Hugo logs
+ignoreLogs = ['warning-goldmark-raw-html']
+
+[params]
+	mode="auto"
+	useCDN=false
+	subtitle = "Personal webpage"
+	customCSS = ["css/custom.css"]
+
+# Enable Hugo Pipes for asset processing
+[build]
+  writeStats = true
+
+[module]
+  [[module.mounts]]
+    source = "assets"
+    target = "assets"
+
+[[params.social]]
+name = "GitHub"
+icon = "github"
+url = "https://github.com/lucamanolache"
+
+[[menu.main]]
+name = "Home"
+url = "/"
+weight = 1
+
+[[menu.main]]
+name = "Posts"
+url = "/posts"
+weight = 2
+
+[[menu.main]]
+name = "Papers"
+url = "/papers"
+weight = 3
+
+[[menu.main]]
+name = "Teaching"
+url = "/teaching"
+weight = 4
+
+[[menu.main]]
+name = "Resume"
+url = "/resume"
+weight = 5
+
+[[menu.main]]
+name = "Tags"
+url = "/tags"
+weight = 7

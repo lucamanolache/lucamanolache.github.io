@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ml on Luca Manolache</title>
+    <link>http://localhost:1313/categories/ml/</link>
+    <description>Recent content in Ml on Luca Manolache</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>© Luca Manolache</copyright>
+    <lastBuildDate>Fri, 08 Sep 2023 16:03:28 -0700</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/ml/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Notes on &#34;Future of Decentralization, AI, and Computing Summit&#34;</title>
+      <link>http://localhost:1313/posts/2023-09-08-conference-summary/</link>
+      <pubDate>Fri, 08 Sep 2023 16:03:28 -0700</pubDate>
+      <guid>http://localhost:1313/posts/2023-09-08-conference-summary/</guid>
+      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;I recently went to the &amp;ldquo;Future of Decentralization, AI, and Computing Summit&amp;rdquo;&#xA;hosted by Berkeley RDI. One of the most compelling presentations was Noam&#xA;Brown&amp;rsquo;s presentation about using reinforcement learning to play the game of&#xA;&lt;a href=&#34;https://en.wikipedia.org/wiki/Diplomacy_(game)&#34;&gt;Diplomacy&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;This is of particular intrest due to Diplomacy&amp;rsquo;s large focus on cooperation.&#xA;Most current algorithms designed for playing games will not work at for&#xA;Diplomacy.&lt;/p&gt;&#xA;&lt;p&gt;To start off, we will go over a short background of current game playing&#xA;algorithms and explain their issue on cooperative games such as Diplomacy.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Sequential MNIST with an LSTM</title>
+      <link>http://localhost:1313/posts/2023-06-09-lstm-mnist/</link>
+      <pubDate>Fri, 09 Jun 2023 22:19:30 -0700</pubDate>
+      <guid>http://localhost:1313/posts/2023-06-09-lstm-mnist/</guid>
+      <description>&lt;p&gt;The sequential MNIST dataset can be found &lt;a href=&#34;https://edwin-de-jong.github.io/blog/mnist-sequence-data/&#34;&gt;here&lt;/a&gt;. Essentially it turns the classic images into brush strokes giving each image as an array of dx and dy. This notebook uses an LSTM to detect the numbers and achieves 93.1% accuracy. I do not do any data augmentation which most likely is lowering the performance and definetly harms its real life usage (I wrote a simple script to draw and recognize numbers and the way I drew numbers mattered a lot - a 7 drawn in reverse was detected differently than a normally drawn 7).&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Finger Snap Detection</title>
+      <link>http://localhost:1313/posts/2023-05-15-snap-detection/</link>
+      <pubDate>Mon, 15 May 2023 19:44:45 -0700</pubDate>
+      <guid>http://localhost:1313/posts/2023-05-15-snap-detection/</guid>
+      <description>&lt;h2 id=&#34;libraries&#34;&gt;Libraries&lt;/h2&gt;&#xA;&lt;p&gt;To detect finger snapping, I will use my favorite machine learning library &lt;code&gt;pytorch&lt;/code&gt;.&#xA;One of the main reasons I am using &lt;code&gt;pytorch&lt;/code&gt; is because it has &lt;code&gt;pytorch-audio&lt;/code&gt;, an amazing helper librarie to work with audio.&#xA;Another reason is for the helper library, &lt;code&gt;pytorch-lightning&lt;/code&gt; which makes training models easier and has automatic integration with &lt;code&gt;tensorboard&lt;/code&gt;.&#xA;To install all the libraries I am using, do &lt;code&gt;pip install torch torchaudio lightning torchvision tensorboard sounddevice&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

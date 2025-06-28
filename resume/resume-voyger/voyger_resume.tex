@@ -1,0 +1,32 @@
+\documentclass[11pt]{article}
+
+\usepackage{../components/commonheader}
+\geometry{margin=0.25in}
+
+\begin{document}
+
+\resumesection{\emoji{books} Education}
+\subimport{../components/education}{berkeley.tex}
+
+\resumesection{\emoji{briefcase} Experience}
+\subimport{../components/experiences/}{mlab.tex}
+\subimport{../components/experiences/}{paly.tex}
+\subimport{../components/experiences/}{audit.tex}
+\subimport{../components/experiences/}{nasa.tex}
+
+\resumesection{\emoji{wrench} Projects}
+\subimport{../components/projects/}{wordle.tex}
+\subimport{../components/projects/}{iksolver.tex}
+\subimport{../components/projects/}{attendance.tex}
+\subimport{../components/projects/}{sight.tex}
+
+\resumesection{\emoji{scroll} Publications}
+\subimport{../components/publications/}{coverage.tex}
+
+\resumesection{\emoji{hand-with-fingers-splayed} Skills}
+\subimport{../components/}{skills.tex}
+
+\resumesection{\emoji{trophy} Awards}
+\subimport{../components/awards/}{awards-voyger.tex}
+
+\end{document}

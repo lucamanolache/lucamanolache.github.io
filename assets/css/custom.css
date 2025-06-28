@@ -1,0 +1,145 @@
+.homepage-content {
+    margin: 2rem auto;
+    max-width: 1000px;
+    padding: 0 2rem;
+    display: block !important;
+}
+
+.profile-container {
+    display: flex !important;
+    align-items: center !important;
+    gap: 3rem !important;
+    margin: 2rem 0 !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+}
+
+.profile-image {
+    flex: 0 0 250px !important;
+    width: 250px !important;
+    height: 200px !important;
+}
+
+.profile-image img {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    object-fit: cover !important;
+    object-position: center 75% !important;
+    border: 3px solid #61afef !important;
+    margin: 0 !important;
+    display: block !important;
+}
+
+.profile-text {
+    flex: 1 1 auto !important;
+    text-align: left !important;
+    max-width: 60% !important;
+}
+
+.profile-text h2 {
+    margin-top: 0;
+    color: #98c379;  /* One Dark Pro green */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 1.5rem !important;
+    }
+    
+    .profile-text {
+        text-align: center !important;
+        max-width: 100% !important;
+    }
+    
+    .profile-image {
+        width: 200px !important;
+        height: 160px !important;
+        margin: 0 auto !important;
+    }
+}
+
+/* Common styles for content pages (teaching, resume, etc.) */
+.content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.content h1 {
+    color: #61afef;  /* One Dark Pro blue */
+    margin-bottom: 2rem;
+}
+
+.content h2 {
+    color: #98c379;  /* One Dark Pro green */
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.content h3 {
+    color: #c678dd;  /* One Dark Pro purple */
+    margin-top: 1.5rem;
+}
+
+.content ul {
+    margin-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.content li {
+    margin-bottom: 0.5rem;
+}
+
+/* Resume specific styles */
+.resume-header {
+    margin-bottom: 2rem;
+}
+
+.resume-section {
+    margin-bottom: 2rem;
+}
+
+.resume-item {
+    margin-bottom: 1.5rem;
+}
+
+.resume-item h4 {
+    color: #e5c07b;  /* One Dark Pro yellow */
+    margin-bottom: 0.5rem;
+}
+
+/* Teaching specific styles */
+.teaching-section {
+    margin-bottom: 3rem;
+}
+
+.course-info {
+    background: rgba(40, 44, 52, 0.3);  /* One Dark Pro background with opacity */
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.resources-list {
+    margin-top: 1rem;
+}
+
+.resources-list a {
+    color: #61afef;  /* One Dark Pro blue */
+    text-decoration: none;
+}
+
+.resources-list a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile responsiveness for content pages */
+@media (max-width: 768px) {
+    .content {
+        padding: 0 1rem;
+    }
+} 

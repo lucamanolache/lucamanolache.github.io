@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	{{ partial "header.html" . }}
+	<body>
+		<div class="content">
+			{{ partial "head.html" . }}
+			
+			<main class="homepage">
+				<div class="homepage-content">
+					<div class="profile-container">
+						<div class="profile-text">
+							<h1>Welcome!</h1>
+							<p>I'm Luca Manolache, a student at UC Berkeley studying Electrical Engineering and Computer Science. 
+							I'm passionate about distributed systems, compilers, building custom accelerators, and making LLM inference more efficient.
+                            I'm currently working on <a href="https://github.com/skypilot-org/skypilot">Skypilot</a>, a intercloud broker for finding the cheapest cloud providers.
+                        </p>
+                        <p>
+                            Some past projects I've worked on are <a href="https://web.lmarena.ai/">Webdev Arena</a> and <a href="https://lmarena.ai/">Chatbot Arena</a>.
+                        </p>
+						</div>
+						<div class="profile-image">
+							<img src="/images/luca.webp" alt="Luca Manolache">
+						</div>
+					</div>
+				</div>
+
+                
+                <hr style="border-top: 0.4rem dotted var(--bordercl); margin: 2rem 0;">
+
+				{{ $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
+				{{ $paginator := .Paginate (where $pages "Params.hidden" "ne" true) }}
+				{{ range $paginator.Pages }}
+				<section class="list-item">
+					<h1 class="title"><a href="{{ .RelPermalink }}">{{.Title}}</a></h1>
+					<time>{{ dateFormat "2006-01-02" .Date }}{{ if .Draft }} <span class="draft-label">DRAFT</span> {{ end }}</time>
+					<br>{{ template "partials/pagedescription.html" . }}
+					<a class="readmore" href="{{ .RelPermalink }}">Read more ⟶</a>
+				</section>
+				{{ end }}
+				{{ template "partials/paginator.html" . }}
+			</main>
+			
+			{{ partial "footer.html" . }}
+		</div>
+	</body>
+</html> 

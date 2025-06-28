@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Luca Manolache</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on Luca Manolache</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>© Luca Manolache</copyright>
+    <lastBuildDate>Fri, 27 Jun 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Papers</title>
+      <link>http://localhost:1313/papers/</link>
+      <pubDate>Fri, 27 Jun 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/papers/</guid>
+      <description>&lt;ol&gt;&#xA;&lt;li&gt;&lt;strong&gt;An Overview of Structural Coverage Metrics for Testing Neural Networks&lt;/strong&gt; (2022)&lt;br&gt;&#xA;&lt;em&gt;Muhammad Usman, Youcheng Sun, Divya Gopinath, Rishi Dange, Luca Manolache, Corina S. Pasareanu&lt;/em&gt;&lt;br&gt;&#xA;International Journal on Software Tools for Technology Transfer&lt;br&gt;&#xA;&lt;a href=&#34;https://link.springer.com/article/10.1007/s10009-022-00683-x&#34;&gt;Paper&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ol&gt;</description>
+    </item>
+    <item>
+      <title>Resume</title>
+      <link>http://localhost:1313/resume/</link>
+      <pubDate>Fri, 27 Jun 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/resume/</guid>
+      <description>&lt;!-- raw HTML omitted --&gt;&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;&lt;h2 id=&#34;education&#34;&gt;Education&lt;/h2&gt;&#xA;&lt;p&gt;University of California, Berkeley &lt;em&gt;(EECS B.S., GPA: 3.87)&lt;/em&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;coursework&#34;&gt;Coursework:&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Spring 2025&lt;/strong&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;em&gt;CS47B&lt;/em&gt; - Data Structures and Algorithms (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS152&lt;/em&gt; - Computer Architecture and Engineering (A+)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS262A&lt;/em&gt; - Advanced Topics in Computer Systems (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS370&lt;/em&gt; - Adaptive Instruction Methods in Computer Science (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;EECS126&lt;/em&gt; - Probability and Random Processes (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;EECS251B&lt;/em&gt; - Advanced Digital Integrated Circuits and Systems (B)&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Fall 2024&lt;/strong&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;em&gt;CS162&lt;/em&gt; - Operating Systems and System Programming (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS189&lt;/em&gt; - Introduction to Machine Learning (A-)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS270&lt;/em&gt; - Combinatorial Algorithms and Data Structures (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;EECS151&lt;/em&gt; - Introduction to Digital Design and Integrated Circuits (A-)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;EECS151LB&lt;/em&gt; - Field-Programmable Gate Array Laboratory (A-)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;MATH221&lt;/em&gt; - Advanced Matrix Computations (A-)&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Summer 2024&lt;/strong&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;em&gt;MATH104&lt;/em&gt; - Introduction to Analysis (A-)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;MATH110&lt;/em&gt; - Abstract Linear Algebra (A+)&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Spring 2024&lt;/strong&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;em&gt;CS70&lt;/em&gt; - Discrete Mathematics and Probability Theory (A-)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS161&lt;/em&gt; - Computer Security (A+)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS164&lt;/em&gt; - Programming Languages and Compilers (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS188&lt;/em&gt; - Introduction to Artificial Intelligence (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;EECS16B&lt;/em&gt; - Designing Information Devices and Systems II (A)&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Fall 2023&lt;/strong&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;em&gt;CS61A&lt;/em&gt; - Structure and Interpretation of Computer Programs (A+)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS61C&lt;/em&gt; - Great Ideas of Computer Architecture (A+)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;CS194&lt;/em&gt; - Special Topics, LLM Safety (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;EECS16A&lt;/em&gt; - Designing Information Devices and Systems I (A)&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;ELENG198&lt;/em&gt; - Directed Group Study (P)&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;&lt;strong&gt;Organizations:&lt;/strong&gt; Machine Learning at Berkeley, HKN (EECS Honor Society)&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Teaching</title>
+      <link>http://localhost:1313/teaching/</link>
+      <pubDate>Fri, 27 Jun 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/teaching/</guid>
+      <description>&lt;!-- raw HTML omitted --&gt;&#xA;&lt;h2 id=&#34;cs-162-operating-systems-and-system-programming&#34;&gt;CS 162: Operating Systems and System Programming&lt;/h2&gt;&#xA;&lt;p&gt;&lt;em&gt;Teaching Assistant&lt;/em&gt; | Spring 2025&lt;/p&gt;&#xA;&lt;h3 id=&#34;resources&#34;&gt;Resources&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://cs162.org/&#34;&gt;Course Website&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://cs162.org/static/proj/pintos-docs/&#34;&gt;PintOS Reference&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+    <item>
+      <title>Notes on &#34;Future of Decentralization, AI, and Computing Summit&#34;</title>
+      <link>http://localhost:1313/posts/2023-09-08-conference-summary/</link>
+      <pubDate>Fri, 08 Sep 2023 16:03:28 -0700</pubDate>
+      <guid>http://localhost:1313/posts/2023-09-08-conference-summary/</guid>
+      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;I recently went to the &amp;ldquo;Future of Decentralization, AI, and Computing Summit&amp;rdquo;&#xA;hosted by Berkeley RDI. One of the most compelling presentations was Noam&#xA;Brown&amp;rsquo;s presentation about using reinforcement learning to play the game of&#xA;&lt;a href=&#34;https://en.wikipedia.org/wiki/Diplomacy_(game)&#34;&gt;Diplomacy&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;This is of particular intrest due to Diplomacy&amp;rsquo;s large focus on cooperation.&#xA;Most current algorithms designed for playing games will not work at for&#xA;Diplomacy.&lt;/p&gt;&#xA;&lt;p&gt;To start off, we will go over a short background of current game playing&#xA;algorithms and explain their issue on cooperative games such as Diplomacy.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Sequential MNIST with an LSTM</title>
+      <link>http://localhost:1313/posts/2023-06-09-lstm-mnist/</link>
+      <pubDate>Fri, 09 Jun 2023 22:19:30 -0700</pubDate>
+      <guid>http://localhost:1313/posts/2023-06-09-lstm-mnist/</guid>
+      <description>&lt;p&gt;The sequential MNIST dataset can be found &lt;a href=&#34;https://edwin-de-jong.github.io/blog/mnist-sequence-data/&#34;&gt;here&lt;/a&gt;. Essentially it turns the classic images into brush strokes giving each image as an array of dx and dy. This notebook uses an LSTM to detect the numbers and achieves 93.1% accuracy. I do not do any data augmentation which most likely is lowering the performance and definetly harms its real life usage (I wrote a simple script to draw and recognize numbers and the way I drew numbers mattered a lot - a 7 drawn in reverse was detected differently than a normally drawn 7).&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Finger Snap Detection</title>
+      <link>http://localhost:1313/posts/2023-05-15-snap-detection/</link>
+      <pubDate>Mon, 15 May 2023 19:44:45 -0700</pubDate>
+      <guid>http://localhost:1313/posts/2023-05-15-snap-detection/</guid>
+      <description>&lt;h2 id=&#34;libraries&#34;&gt;Libraries&lt;/h2&gt;&#xA;&lt;p&gt;To detect finger snapping, I will use my favorite machine learning library &lt;code&gt;pytorch&lt;/code&gt;.&#xA;One of the main reasons I am using &lt;code&gt;pytorch&lt;/code&gt; is because it has &lt;code&gt;pytorch-audio&lt;/code&gt;, an amazing helper librarie to work with audio.&#xA;Another reason is for the helper library, &lt;code&gt;pytorch-lightning&lt;/code&gt; which makes training models easier and has automatic integration with &lt;code&gt;tensorboard&lt;/code&gt;.&#xA;To install all the libraries I am using, do &lt;code&gt;pip install torch torchaudio lightning torchvision tensorboard sounddevice&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Windows VM with VIFO passthrough</title>
+      <link>http://localhost:1313/posts/2023-05-07-vifo-passthrough/</link>
+      <pubDate>Sun, 07 May 2023 19:24:45 -0700</pubDate>
+      <guid>http://localhost:1313/posts/2023-05-07-vifo-passthrough/</guid>
+      <description>&lt;h2 id=&#34;credits&#34;&gt;Credits&lt;/h2&gt;&#xA;&lt;p&gt;To install Windows with VIFO passthrough, I followed this &lt;a href=&#34;https://github.com/QaidVoid/Complete-Single-GPU-Passthrough#video-card-driver-virtualisation-detection&#34;&gt;guide&lt;/a&gt;.&#xA;I had to follow some extra steps to make it work on my computer.&#xA;You should read and use the original guide first and look back here if you have the same problems I had with the original guide.&lt;/p&gt;&#xA;&lt;h2 id=&#34;system-setup&#34;&gt;System Setup&lt;/h2&gt;&#xA;&lt;p&gt;Make sure that your BIOS supports virtualization, this should be either &lt;em&gt;Intel VT-d&lt;/em&gt; or &lt;em&gt;AMD-Vi&lt;/em&gt; in BIOS settings.&#xA;Next, add the following kernel parameters &lt;code&gt;... intel_iommu=on iommu=pt ...&lt;/code&gt; or &lt;code&gt;... amd_iommu=on iommu=pt ...&lt;/code&gt;.&#xA;For GRUB users, this is found in &lt;code&gt;/etc/default/grub&lt;/code&gt; and for REFIND users this was found for me at &lt;code&gt;/boot/refind_linux.conf&lt;/code&gt;.&#xA;GRUB users should then regenerate their grub config with &lt;code&gt;grub-mkconfig -o /boot/grub/grub.cfg&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

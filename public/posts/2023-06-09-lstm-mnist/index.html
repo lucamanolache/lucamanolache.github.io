@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html><head lang="en"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Sequential MNIST with an LSTM - Luca Manolache</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Using LSTM neural networks to recognize handwritten digits from the sequential MNIST dataset, which represents digits as brush strokes rather than images." />
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content="http://localhost:1313/posts/2023-06-09-lstm-mnist/">
+  <meta property="og:site_name" content="Luca Manolache">
+  <meta property="og:title" content="Sequential MNIST with an LSTM">
+  <meta property="og:description" content="Using LSTM neural networks to recognize handwritten digits from the sequential MNIST dataset, which represents digits as brush strokes rather than images.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-06-09T22:19:30-07:00">
+    <meta property="article:modified_time" content="2023-06-09T22:19:30-07:00">
+    <meta property="article:tag" content="Ml">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Sequential MNIST with an LSTM">
+  <meta name="twitter:description" content="Using LSTM neural networks to recognize handwritten digits from the sequential MNIST dataset, which represents digits as brush strokes rather than images.">
+
+        <link href="http://localhost:1313/css/fonts.2c2227b81b1970a03e760aa2e6121cd01f87c88586803cbb282aa224720a765f.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" media="screen" href="http://localhost:1313/css/main.ebab3cdab514812ae87420376868866f1f961f23c3eba7d8d1f16eb62308a54b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="http://localhost:1313/css/dark.0953caef1b838ade4b219e3b6b9b54f92357b9ff5c3f3ddec1c1f583b807cbbc.css" media="(prefers-color-scheme: dark)"  />
+		
+		<link rel="stylesheet" type="text/css" href="http://localhost:1313/css/custom.c98772c6a0e44a03c25b6b1d0a53b4ee8e5f95502683a7993fd45decfcbdc6d0.css">
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="http://localhost:1313/">Luca Manolache</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">Posts</a>
+		
+		<a href="/papers">Papers</a>
+		
+		<a href="/teaching">Teaching</a>
+		
+		<a href="/resume">Resume</a>
+		
+		<a href="/tags">Tags</a>
+		
+		
+	</nav>
+</header>
+
+<main>
+  <article>
+    <div class="post-container">
+      
+      <div class="post-content">
+        <div class="title">
+          <h1 class="title">Sequential MNIST with an LSTM</h1>
+          <div class="meta">Posted on Jun 9, 2023</div>
+        </div>
+        
+        <section class="body">
+          <p>The sequential MNIST dataset can be found <a href="https://edwin-de-jong.github.io/blog/mnist-sequence-data/">here</a>. Essentially it turns the classic images into brush strokes giving each image as an array of dx and dy. This notebook uses an LSTM to detect the numbers and achieves 93.1% accuracy. I do not do any data augmentation which most likely is lowering the performance and definetly harms its real life usage (I wrote a simple script to draw and recognize numbers and the way I drew numbers mattered a lot - a 7 drawn in reverse was detected differently than a normally drawn 7).</p>
+<h2 id="imports">Imports</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> re
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> rich <span style="color:#f92672">import</span> print
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> tqdm <span style="color:#f92672">import</span> tqdm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch <span style="color:#f92672">import</span> nn
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch <span style="color:#f92672">import</span> optim
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch.nn.functional <span style="color:#66d9ef">as</span> F
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch.autograd <span style="color:#f92672">import</span> Variable
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch.utils.data <span style="color:#f92672">import</span> Dataset, DataLoader
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torchsummary <span style="color:#f92672">import</span> summary
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> matplotlib <span style="color:#f92672">import</span> pyplot <span style="color:#66d9ef">as</span> plt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>torch<span style="color:#f92672">.</span>cuda<span style="color:#f92672">.</span>is_available()
+</span></span></code></pre></div><pre><code>True
+</code></pre>
+<h2 id="data">Data</h2>
+<p>To get the data, downlaod it from <a href="https://github.com/edwin-de-jong/mnist-digits-stroke-sequence-data/raw/master/sequences.tar.gz">here</a>. After extracting it, it should all be in a folder called sequences. All of the images are labaled with <code>{train/test}img-{x}-inputdata.txt</code> where <code>{x}</code> is a number from 1 - 60000 (not its label). The classic labels are found in 2 files, <code>trainlabels.txt</code> and <code>testlabels.txt</code>.</p>
+<p>To get an image and its label, you need to find the file with <code>x = idx</code> and the x&rsquo;th line of either <code>{train/test}labels.txt</code>. The labels files are a long list of numbers. The i&rsquo;th number corresponds with the file with that number.</p>
+<p>Each file is a list of <code>dx</code>, <code>dy</code>, <code>eos</code>, and <code>eof</code> seperated by space. A sample is shown below.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-txt" data-lang="txt"><span style="display:flex;"><span>9 14 0 0
+</span></span><span style="display:flex;"><span>0 1 0 0
+</span></span><span style="display:flex;"><span>-1 1 0 0
+</span></span><span style="display:flex;"><span>0 1 0 0
+</span></span><span style="display:flex;"><span>0 1 0 0
+</span></span><span style="display:flex;"><span>0 1 0 0
+</span></span><span style="display:flex;"><span>0 1 0 0
+</span></span><span style="display:flex;"><span>0 1 0 0
+</span></span><span style="display:flex;"><span>0 1 0 0
+</span></span><span style="display:flex;"><span>1 0 0 0
+</span></span><span style="display:flex;"><span>1 0 0 0
+</span></span><span style="display:flex;"><span>1 1 0 0
+</span></span><span style="display:flex;"><span>1 -1 0 0
+</span></span><span style="display:flex;"><span>........
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;data/sequences/&#34;</span>
+</span></span><span style="display:flex;"><span>files <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>listdir(path)
+</span></span><span style="display:flex;"><span>train_data <span style="color:#f92672">=</span> [path <span style="color:#f92672">+</span> f <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> files <span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isfile(path <span style="color:#f92672">+</span> f) <span style="color:#f92672">and</span> <span style="color:#e6db74">&#34;inputdata&#34;</span> <span style="color:#f92672">in</span> f <span style="color:#f92672">and</span> <span style="color:#e6db74">&#34;trainimg&#34;</span> <span style="color:#f92672">in</span> f]
+</span></span><span style="display:flex;"><span>test_data <span style="color:#f92672">=</span> [path <span style="color:#f92672">+</span> f <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> files <span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isfile(path <span style="color:#f92672">+</span> f) <span style="color:#f92672">and</span> <span style="color:#e6db74">&#34;inputdata&#34;</span> <span style="color:#f92672">in</span> f <span style="color:#f92672">and</span> <span style="color:#e6db74">&#34;testimg&#34;</span> <span style="color:#f92672">in</span> f]
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Found&#34;</span>, len(train_data), <span style="color:#e6db74">&#34;training images and&#34;</span>, len(test_data), <span style="color:#e6db74">&#34;testing images&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_labels <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>genfromtxt(path <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;trainlabels.txt&#34;</span>, dtype<span style="color:#f92672">=</span>int)
+</span></span><span style="display:flex;"><span>test_labels <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>genfromtxt(path <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;testlabels.txt&#34;</span>, dtype<span style="color:#f92672">=</span>int)
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h3 id="sample-data">Sample data</h3>
+<p>First we define some helper functions. <code>get_idx</code> has a simple regex to convert file names into what idx it is. We will use this to sort the files for quicker access later. <code>make_img</code> is an extremely slow but easy way to create an image which integrates <code>dx</code> and <code>dy</code> to find which pixels should be made black. <code>eos</code> defines the end of a stroke, when the pen needs to be lifted to go somewhere else. <code>eof</code> defines the end of the file and is the last pixel.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_idx</span>(f):
+</span></span><span style="display:flex;"><span>    idx <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>search(<span style="color:#e6db74">&#34;-\d+-&#34;</span>, f)
+</span></span><span style="display:flex;"><span>    idx <span style="color:#f92672">=</span> int(f[idx<span style="color:#f92672">.</span>start() <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>:idx<span style="color:#f92672">.</span>end() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> idx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">make_img</span>(data):
+</span></span><span style="display:flex;"><span>    img <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>zeros((<span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>))
+</span></span><span style="display:flex;"><span>    x, y <span style="color:#f92672">=</span> (<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> row <span style="color:#f92672">in</span> data:
+</span></span><span style="display:flex;"><span>        dx <span style="color:#f92672">=</span> row[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>        dy <span style="color:#f92672">=</span> row[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        eos <span style="color:#f92672">=</span> row[<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>        eof <span style="color:#f92672">=</span> row[<span style="color:#ae81ff">3</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> x <span style="color:#f92672">+</span> dx
+</span></span><span style="display:flex;"><span>        y <span style="color:#f92672">=</span> y <span style="color:#f92672">+</span> dy
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> eos <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">and</span> eof <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>            img[x][y] <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">elif</span> eof <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>            img[x][y] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.75</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            img[x][y] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> img
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>train_data <span style="color:#f92672">=</span> sorted(train_data, key<span style="color:#f92672">=</span><span style="color:#66d9ef">lambda</span> f: get_idx(f))
+</span></span><span style="display:flex;"><span>test_data <span style="color:#f92672">=</span> sorted(test_data, key<span style="color:#f92672">=</span><span style="color:#66d9ef">lambda</span> f: get_idx(f))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>file <span style="color:#f92672">=</span> train_data[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>idx <span style="color:#f92672">=</span> get_idx(file)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Index: &#34;</span>, idx, <span style="color:#e6db74">&#34;File:&#34;</span>, file, <span style="color:#e6db74">&#34;Label:&#34;</span>, train_data[idx])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>genfromtxt(file, delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39; &#39;</span>, dtype<span style="color:#f92672">=</span>int)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>img <span style="color:#f92672">=</span> make_img(data)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>imshow(img<span style="color:#f92672">.</span>T)
+</span></span></code></pre></div><p><img src="/images/mnist-lstm_files/mnist-lstm_7_3.png" alt="png"></p>
+<h3 id="dataset">Dataset</h3>
+<p>To turn our array into a torch dataset, we need to efficiently get from an index to a corresponding file/label pair. Since we already got the file list sorted above and have the label list, we won&rsquo;t regenerate those in the dataset. We will take in a list of labels that has already been loaded from the label file and take a list of image file paths that is sorted before in the correct order. This makes the dataset just need to load from a file.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SeqMNIST</span>(Dataset):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self, labels, data):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>labels <span style="color:#f92672">=</span> labels
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>data <span style="color:#f92672">=</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__len__</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> len(self<span style="color:#f92672">.</span>labels)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__getitem__</span>(self, idx):
+</span></span><span style="display:flex;"><span>        label <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>labels[idx]
+</span></span><span style="display:flex;"><span>        img <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>genfromtxt(self<span style="color:#f92672">.</span>data[idx], delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39; &#39;</span>, dtype<span style="color:#f92672">=</span>int)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> label, img
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>train_dataset <span style="color:#f92672">=</span> SeqMNIST(train_labels, train_data)
+</span></span><span style="display:flex;"><span>test_dataset <span style="color:#f92672">=</span> SeqMNIST(test_labels, test_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_loader <span style="color:#f92672">=</span> DataLoader(train_dataset, batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>test_loader <span style="color:#f92672">=</span> DataLoader(test_dataset, batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i, (label, data) <span style="color:#f92672">in</span> enumerate(train_dataset):
+</span></span><span style="display:flex;"><span>    ax <span style="color:#f92672">=</span> plt<span style="color:#f92672">.</span>subplot(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">6</span>, i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    plt<span style="color:#f92672">.</span>tight_layout()
+</span></span><span style="display:flex;"><span>    ax<span style="color:#f92672">.</span>set_title(<span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(label))
+</span></span><span style="display:flex;"><span>    ax<span style="color:#f92672">.</span>axis(<span style="color:#e6db74">&#39;off&#39;</span>)
+</span></span><span style="display:flex;"><span>    img <span style="color:#f92672">=</span> make_img(data)
+</span></span><span style="display:flex;"><span>    plt<span style="color:#f92672">.</span>imshow(img<span style="color:#f92672">.</span>T)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> i <span style="color:#f92672">==</span> <span style="color:#ae81ff">5</span>:
+</span></span><span style="display:flex;"><span>        plt<span style="color:#f92672">.</span>show()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span></code></pre></div><p><img src="/images/mnist-lstm_files/mnist-lstm_11_0.png" alt="png"></p>
+<h2 id="model">Model</h2>
+<p>For the model, because the sequences can be of any lenght, we are using an LSTM. Our model is very simple with only an LSTM layer feeding into a linear and softmax layer that outputs to the 10 classes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LSTMTagger</span>(nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self, input_size, hidden_size, num_layers, output_size<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>):
+</span></span><span style="display:flex;"><span>        super(LSTMTagger, self)<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>lstm <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>LSTM(input_size, hidden_size, num_layers<span style="color:#f92672">=</span>num_layers)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>hidden2tag <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Linear(hidden_size <span style="color:#f92672">*</span> num_layers, output_size)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self, seq):
+</span></span><span style="display:flex;"><span>        lstm_out, _ <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>lstm(seq)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        lstm_out <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>flatten(lstm_out)
+</span></span><span style="display:flex;"><span>        tag_space <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>hidden2tag(lstm_out)
+</span></span><span style="display:flex;"><span>        tag_scores <span style="color:#f92672">=</span> F<span style="color:#f92672">.</span>softmax(tag_space, dim<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> tag_scores
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> LSTMTagger(<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">32</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">10</span>)<span style="color:#f92672">.</span>cuda()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>optimizer <span style="color:#f92672">=</span> optim<span style="color:#f92672">.</span>SGD(model<span style="color:#f92672">.</span>parameters(), lr<span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>, momentum<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(model)
+</span></span><span style="display:flex;"><span>print(sum(p<span style="color:#f92672">.</span>numel() <span style="color:#66d9ef">for</span> p <span style="color:#f92672">in</span> model<span style="color:#f92672">.</span>parameters()), <span style="color:#e6db74">&#34;trainable parameters&#34;</span>)
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h2 id="training">Training</h2>
+<p>For training, we will save the model every time the validation accuracy increases. I was paranoid of losing the model so I made it save too liberally. So when running this, it saved way too many times and I had to clean my folder of all the random model checkpoints I had.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>criterion <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>CrossEntropyLoss()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_loss <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>train_acc <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>val_loss <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>val_acc <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>max_val <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> epoch <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">50</span>):
+</span></span><span style="display:flex;"><span>    avg_loss <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    correct <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    en <span style="color:#f92672">=</span> tqdm(enumerate(train_loader))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> step, (label, seq) <span style="color:#f92672">in</span> en:
+</span></span><span style="display:flex;"><span>        optimizer<span style="color:#f92672">.</span>zero_grad()
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        bx <span style="color:#f92672">=</span> Variable(seq)<span style="color:#f92672">.</span>cuda()<span style="color:#f92672">.</span>squeeze()<span style="color:#f92672">.</span>float()
+</span></span><span style="display:flex;"><span>        output <span style="color:#f92672">=</span> model(bx)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        maxi <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>argmax(output)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> maxi<span style="color:#f92672">.</span>item() <span style="color:#f92672">==</span> label<span style="color:#f92672">.</span>item():
+</span></span><span style="display:flex;"><span>            correct <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        label <span style="color:#f92672">=</span> label<span style="color:#f92672">.</span>cuda()<span style="color:#f92672">.</span>squeeze()
+</span></span><span style="display:flex;"><span>        loss <span style="color:#f92672">=</span> criterion(output, label)
+</span></span><span style="display:flex;"><span>        loss<span style="color:#f92672">.</span>backward()
+</span></span><span style="display:flex;"><span>        optimizer<span style="color:#f92672">.</span>step()
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        avg_loss <span style="color:#f92672">+=</span> loss<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        en<span style="color:#f92672">.</span>set_description(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> - Train accuracy </span><span style="color:#e6db74">{:.4f}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(step, len(train_loader), correct <span style="color:#f92672">/</span> (step <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)))
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Completed epoch&#34;</span>, epoch, <span style="color:#e6db74">&#34;with avg. loss&#34;</span>, avg_loss <span style="color:#f92672">/</span> len(train_loader), <span style="color:#e6db74">&#34;and accuracy&#34;</span>, correct <span style="color:#f92672">/</span> len(train_loader))
+</span></span><span style="display:flex;"><span>    train_loss<span style="color:#f92672">.</span>append(avg_loss <span style="color:#f92672">/</span> len(train_loader))
+</span></span><span style="display:flex;"><span>    train_acc<span style="color:#f92672">.</span>append(correct <span style="color:#f92672">/</span> len(train_loader))
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    avg_loss <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    correct <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    en <span style="color:#f92672">=</span> tqdm(enumerate(test_loader))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> step, (label, seq) <span style="color:#f92672">in</span> en:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> torch<span style="color:#f92672">.</span>no_grad():
+</span></span><span style="display:flex;"><span>            bx <span style="color:#f92672">=</span> Variable(seq)<span style="color:#f92672">.</span>cuda()<span style="color:#f92672">.</span>squeeze()<span style="color:#f92672">.</span>float()
+</span></span><span style="display:flex;"><span>            output <span style="color:#f92672">=</span> model(bx)
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            maxi <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>argmax(output)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> maxi<span style="color:#f92672">.</span>item() <span style="color:#f92672">==</span> label<span style="color:#f92672">.</span>item():
+</span></span><span style="display:flex;"><span>                correct <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            label <span style="color:#f92672">=</span> label<span style="color:#f92672">.</span>cuda()<span style="color:#f92672">.</span>squeeze()
+</span></span><span style="display:flex;"><span>            loss <span style="color:#f92672">=</span> criterion(output, label)
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            en<span style="color:#f92672">.</span>set_description(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> - Val accuracy </span><span style="color:#e6db74">{:.4f}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(step, len(test_loader), correct <span style="color:#f92672">/</span> (step <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)))
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    val_loss<span style="color:#f92672">.</span>append(avg_loss <span style="color:#f92672">/</span> len(test_loader))
+</span></span><span style="display:flex;"><span>    val_acc<span style="color:#f92672">.</span>append(correct <span style="color:#f92672">/</span> len(test_loader))
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> correct <span style="color:#f92672">/</span> len(test_loader) <span style="color:#f92672">&gt;</span> max_val:
+</span></span><span style="display:flex;"><span>        max_val <span style="color:#f92672">=</span> correct <span style="color:#f92672">/</span> len(test_loader)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Saving checkpoint with&#34;</span>, max_val, <span style="color:#e6db74">&#34;accuracy on epoch&#34;</span>, epoch)
+</span></span><span style="display:flex;"><span>        torch<span style="color:#f92672">.</span>save({
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;epoch&#39;</span>: epoch,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;model_state_dict&#39;</span>: model<span style="color:#f92672">.</span>state_dict(),
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;optimizer_state_dict&#39;</span>: optimizer<span style="color:#f92672">.</span>state_dict(),
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;loss&#39;</span>: val_loss,
+</span></span><span style="display:flex;"><span>            }, <span style="color:#e6db74">&#34;lstm-chk-</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">.pt&#34;</span><span style="color:#f92672">.</span>format(epoch))
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>torch<span style="color:#f92672">.</span>save(model, <span style="color:#e6db74">&#39;models/lstm-trained.pt&#39;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model_scripted <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>jit<span style="color:#f92672">.</span>script(model)
+</span></span><span style="display:flex;"><span>model_scripted<span style="color:#f92672">.</span>save(<span style="color:#e6db74">&#39;model_scripted.pt&#39;</span>)
+</span></span></code></pre></div>
+        </section>
+        <div class="post-tags">
+          
+          
+          <nav class="nav tags">
+            <ul class="tags">
+              
+              <li><a href="/tags/ml">ml</a></li>
+              
+            </ul>
+          </nav>
+          
+          
+        </div>
+      </div>
+
+      
+      
+    </div>
+
+    </article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/lucamanolache" rel="me" title="GitHub"><svg class="feather">
+   <use href="/svg/feather-sprite.51cf5647cb1987f769b616558f2620fd9423d72058490231b391bf6aa3744b55.svg#github" />
+</svg></a><a class="border"></a></div>
+  <div class="footer-info">
+    2025  © Luca Manolache 
+  </div>
+</footer>
+
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    }
+  };
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+ </div>
+    </body>
+</html> 

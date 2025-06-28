@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on Luca Manolache</title>
+    <link>http://localhost:1313/tags/linux/</link>
+    <description>Recent content in Linux on Luca Manolache</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>© Luca Manolache</copyright>
+    <lastBuildDate>Sun, 07 May 2023 19:24:45 -0700</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Windows VM with VIFO passthrough</title>
+      <link>http://localhost:1313/posts/2023-05-07-vifo-passthrough/</link>
+      <pubDate>Sun, 07 May 2023 19:24:45 -0700</pubDate>
+      <guid>http://localhost:1313/posts/2023-05-07-vifo-passthrough/</guid>
+      <description>&lt;h2 id=&#34;credits&#34;&gt;Credits&lt;/h2&gt;&#xA;&lt;p&gt;To install Windows with VIFO passthrough, I followed this &lt;a href=&#34;https://github.com/QaidVoid/Complete-Single-GPU-Passthrough#video-card-driver-virtualisation-detection&#34;&gt;guide&lt;/a&gt;.&#xA;I had to follow some extra steps to make it work on my computer.&#xA;You should read and use the original guide first and look back here if you have the same problems I had with the original guide.&lt;/p&gt;&#xA;&lt;h2 id=&#34;system-setup&#34;&gt;System Setup&lt;/h2&gt;&#xA;&lt;p&gt;Make sure that your BIOS supports virtualization, this should be either &lt;em&gt;Intel VT-d&lt;/em&gt; or &lt;em&gt;AMD-Vi&lt;/em&gt; in BIOS settings.&#xA;Next, add the following kernel parameters &lt;code&gt;... intel_iommu=on iommu=pt ...&lt;/code&gt; or &lt;code&gt;... amd_iommu=on iommu=pt ...&lt;/code&gt;.&#xA;For GRUB users, this is found in &lt;code&gt;/etc/default/grub&lt;/code&gt; and for REFIND users this was found for me at &lt;code&gt;/boot/refind_linux.conf&lt;/code&gt;.&#xA;GRUB users should then regenerate their grub config with &lt;code&gt;grub-mkconfig -o /boot/grub/grub.cfg&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

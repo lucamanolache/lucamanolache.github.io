@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html><head lang="en"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Windows VM with VIFO passthrough - Luca Manolache</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Credits
+To install Windows with VIFO passthrough, I followed this guide.
+I had to follow some extra steps to make it work on my computer.
+You should read and use the original guide first and look back here if you have the same problems I had with the original guide.
+System Setup
+Make sure that your BIOS supports virtualization, this should be either Intel VT-d or AMD-Vi in BIOS settings.
+Next, add the following kernel parameters ... intel_iommu=on iommu=pt ... or ... amd_iommu=on iommu=pt ....
+For GRUB users, this is found in /etc/default/grub and for REFIND users this was found for me at /boot/refind_linux.conf.
+GRUB users should then regenerate their grub config with grub-mkconfig -o /boot/grub/grub.cfg." />
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content="http://localhost:1313/posts/vifo-passthrough/">
+  <meta property="og:site_name" content="Luca Manolache">
+  <meta property="og:title" content="Windows VM with VIFO passthrough">
+  <meta property="og:description" content="Credits To install Windows with VIFO passthrough, I followed this guide. I had to follow some extra steps to make it work on my computer. You should read and use the original guide first and look back here if you have the same problems I had with the original guide.
+System Setup Make sure that your BIOS supports virtualization, this should be either Intel VT-d or AMD-Vi in BIOS settings. Next, add the following kernel parameters ... intel_iommu=on iommu=pt ... or ... amd_iommu=on iommu=pt .... For GRUB users, this is found in /etc/default/grub and for REFIND users this was found for me at /boot/refind_linux.conf. GRUB users should then regenerate their grub config with grub-mkconfig -o /boot/grub/grub.cfg.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-05-07T19:24:45-07:00">
+    <meta property="article:modified_time" content="2023-05-07T19:24:45-07:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Windows VM with VIFO passthrough">
+  <meta name="twitter:description" content="Credits To install Windows with VIFO passthrough, I followed this guide. I had to follow some extra steps to make it work on my computer. You should read and use the original guide first and look back here if you have the same problems I had with the original guide.
+System Setup Make sure that your BIOS supports virtualization, this should be either Intel VT-d or AMD-Vi in BIOS settings. Next, add the following kernel parameters ... intel_iommu=on iommu=pt ... or ... amd_iommu=on iommu=pt .... For GRUB users, this is found in /etc/default/grub and for REFIND users this was found for me at /boot/refind_linux.conf. GRUB users should then regenerate their grub config with grub-mkconfig -o /boot/grub/grub.cfg.">
+
+        <link href="http://localhost:1313/css/fonts.2c2227b81b1970a03e760aa2e6121cd01f87c88586803cbb282aa224720a765f.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" media="screen" href="http://localhost:1313/css/main.ebab3cdab514812ae87420376868866f1f961f23c3eba7d8d1f16eb62308a54b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="http://localhost:1313/css/dark.0953caef1b838ade4b219e3b6b9b54f92357b9ff5c3f3ddec1c1f583b807cbbc.css" media="(prefers-color-scheme: dark)"  />
+		
+		<link rel="stylesheet" type="text/css" href="http://localhost:1313/css/custom.c98772c6a0e44a03c25b6b1d0a53b4ee8e5f95502683a7993fd45decfcbdc6d0.css">
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="http://localhost:1313/">Luca Manolache</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">Posts</a>
+		
+		<a href="/papers">Papers</a>
+		
+		<a href="/teaching">Teaching</a>
+		
+		<a href="/resume">Resume</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		
+	</nav>
+</header>
+
+<main>
+  <article>
+    <div class="post-container">
+      
+      <div class="post-content">
+        <div class="title">
+          <h1 class="title">Windows VM with VIFO passthrough</h1>
+          <div class="meta">Posted on May 7, 2023</div>
+        </div>
+        
+        <section class="body">
+          <h2 id="credits">Credits</h2>
+<p>To install Windows with VIFO passthrough, I followed this <a href="https://github.com/QaidVoid/Complete-Single-GPU-Passthrough#video-card-driver-virtualisation-detection">guide</a>.
+I had to follow some extra steps to make it work on my computer.
+You should read and use the original guide first and look back here if you have the same problems I had with the original guide.</p>
+<h2 id="system-setup">System Setup</h2>
+<p>Make sure that your BIOS supports virtualization, this should be either <em>Intel VT-d</em> or <em>AMD-Vi</em> in BIOS settings.
+Next, add the following kernel parameters <code>... intel_iommu=on iommu=pt ...</code> or <code>... amd_iommu=on iommu=pt ...</code>.
+For GRUB users, this is found in <code>/etc/default/grub</code> and for REFIND users this was found for me at <code>/boot/refind_linux.conf</code>.
+GRUB users should then regenerate their grub config with <code>grub-mkconfig -o /boot/grub/grub.cfg</code>.</p>
+<p>Next, run the following script:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>shopt -s nullglob
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> g in <span style="color:#e6db74">`</span>find /sys/kernel/iommu_groups/* -maxdepth <span style="color:#ae81ff">0</span> -type d | sort -V<span style="color:#e6db74">`</span>; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;IOMMU Group </span><span style="color:#e6db74">${</span>g##*/<span style="color:#e6db74">}</span><span style="color:#e6db74">:&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> d in $g/devices/*; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>        echo -e <span style="color:#e6db74">&#34;\t</span><span style="color:#66d9ef">$(</span>lspci -nns <span style="color:#e6db74">${</span>d##*/<span style="color:#e6db74">}</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">done</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>;
+</span></span></code></pre></div><p>Ideally, this will show everything with your GPU in one single IOMMU group like below:</p>
+<pre tabindex="0"><code>IOMMU Group 21:
+       0a:00.1 Audio device [0403]: NVIDIA Corporation AD102 High Definition Audio Controller [10de:22ba] (rev a1)
+       0a:00.0 VGA compatible controller [0300]: NVIDIA Corporation AD102 [GeForce RTX 4090] [10de:2684] (rev a1)
+</code></pre><p>If the IOMMU group contains slightly more things it should be fine, but make sure you read exactly what is there.
+When doing PCI passthrough, you <em>NEED</em> to include everything from the IOMMU groups that your card is in.
+For me, this IOMMU group originally contained everything, including my NVME disk and etherenet controller.
+If this is the case you should follow the instructions in <em>ACS Override Patch</em> (hopefully not because it can be a pain).</p>
+<h3 id="acs-override-patch">ACS Override Patch</h3>
+<p>For ACS Override Patch, you must get a kernel that has it.
+You can either build this kernel yourself after applying the patch or install the Zen Kernel.
+For Arch Linux this can be done with <code>sudo pacman -S linux-zen-headers linux-zen nvidia-dkms</code>.
+Make sure you install <code>nvidia-dkms</code> because the standard <code>nvidia</code> package will not work with the Zen Kernel.
+Next, make sure Zen is added to either your GRUB or REFIND.
+For me, I had to edit my REFIND config to ensure that Zen had an <code>initrd</code> which was not set for some reason.</p>
+<p>After installing Zen and adding it to GRUB or REFIND, add <code>pcie_acs_override=downstream,multifunction</code> to your kernel options.</p>
+<h2 id="making-the-vm">Making the VM</h2>
+<p>To make and manage virtual machines, I like to use <code>virt-manager</code>.
+It provides a nice GUI for <code>libvirt</code> which runs on a <code>qemu</code> backend.</p>
+<p>To start off, download a Windows 10 iso from Microsoft, this <a href="https://www.microsoft.com/en-us/software-download/windows10ISO">link</a> should work.
+Then download the <a href="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso">virtio</a> drivers.
+Without this, you will not be able to install Windows properly.
+Now, to install Windows, launch <code>virt-manager</code> and proceed as normal until clicking <em>Customize before install</em> on the final step.</p>
+<p>We need to do the following for this to work (following is copied from the guide):</p>
+<ol>
+<li>In <em>Overview</em> section, set <em>Chipset</em> to <em>Q35</em>, and <em>Firmware</em> to <em>UEFI</em></li>
+<li>In <em>CPUs</em> section, set <em>CPU</em> model to <em>host-passthrough</em>, and <em>CPU Topology</em> to whatever fits your system.</li>
+<li>For <em>SATA</em> disk of VM, set <em>Disk Bus</em> to <em>virtio</em>.</li>
+<li>In <em>NIC</em> section, set <em>Device Model</em> to <em>virtio</em></li>
+<li><em>Add Hardware</em> &gt; CDROM: virtio-win.iso</li>
+</ol>
+<p>When doing this, I found a problem with step <em>2</em>.
+I set <em>CPU Topology</em> to the option to <em>Copy host CPU configuration</em> and did not manually set the topology myself.
+After intalling Windows, this resulted in a single core/thread for the VM.
+To fix this, I had to manually set my topology.
+To do this, set <em>sockets</em> to 1 (unless you have multiple CPUs in your system?), <em>cores</em> to the number of cores your CPU has, and <em>threads</em> to 2 (assuming 2 threads per core).
+To double check if this works, make sure the <em>vCPU</em> allocation matches the number of threads on your system.</p>
+<h3 id="pci-devices">PCI Devices</h3>
+<p>I suggest installing Windows normally from this point on before continuing with the VIFO passthrough.</p>
+<p>Once Windows is installed, remove Channel Spice, Display Spice, Video QXL, Sound ich* and other unnecessary devices.
+Now click on <em>Add Hardware</em> and add PCI Devices which match everything from your GPU.</p>
+<p>Follow the instructions <a href="https://github.com/QaidVoid/Complete-Single-GPU-Passthrough#libvirt-hooks">here</a> to add libvirt hooks.</p>
+<h3 id="keyboardmouse-passthrough">Keyboard/Mouse Passthrough</h3>
+<p>While the guide does offer two methods, using either <em>USB Host Device</em> option from virtmanager or <em>Edev passthrough</em>, I found only the first method worked.
+Fortunetly, this is the easier of the two methods, all you need is to go to <em>Add Hardware</em> &gt; <em>USB Host Device</em> and add your keyboard and mouse.</p>
+
+        </section>
+        <div class="post-tags">
+          
+          
+          
+        </div>
+      </div>
+
+      
+      
+    </div>
+
+    </article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/lucamanolache" rel="me" title="GitHub"><svg class="feather">
+   <use href="/svg/feather-sprite.51cf5647cb1987f769b616558f2620fd9423d72058490231b391bf6aa3744b55.svg#github" />
+</svg></a><a class="border"></a></div>
+  <div class="footer-info">
+    2025  © Luca Manolache 
+  </div>
+</footer>
+
+</div>
+    </body>
+</html>
